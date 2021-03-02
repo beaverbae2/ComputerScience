@@ -1,12 +1,12 @@
 # Network
 
-- [URI와 URL](#uri과-url)
+- [URI와 URL](#uri와-url)
 
 - [GET과 POST](#get과-post)
 
 <br>
 
-### URI과 URL
+### URI와 URL
 
 - URI 
   - Uniform Resource Identifier
