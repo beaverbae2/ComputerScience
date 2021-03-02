@@ -6,11 +6,11 @@
 
 <br>
 
-##### URI과 URL
+#### URI과 URL
 
 - URI 
   - Uniform Resource Identifier
-  - 네트워크 상의 자원 식별자
+  - 네트워크 상의 **자원 식별자**
 - URL
   - Uniform Resource Locator
   - 인터넷에 있는 자원을 나타내는 **유일한 주소(위치)**
@@ -23,7 +23,7 @@
 
 <br>
 
-##### GET과 POST
+#### GET과 POST
 
 - 참고자료
   - [기록하기 - GET과 POST의 차이](https://hongsii.github.io/2017/08/02/what-is-the-difference-get-and-post/)
