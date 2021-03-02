@@ -1,4 +1,4 @@
-### Network
+# Network
 
 - [URI와 URL](#uri과-url)
 
@@ -6,7 +6,7 @@
 
 <br>
 
-#### URI과 URL
+### URI과 URL
 
 - URI 
   - Uniform Resource Identifier
@@ -23,7 +23,7 @@
 
 <br>
 
-#### GET과 POST
+### GET과 POST
 
 - 참고자료
   - [기록하기 - GET과 POST의 차이](https://hongsii.github.io/2017/08/02/what-is-the-difference-get-and-post/)
