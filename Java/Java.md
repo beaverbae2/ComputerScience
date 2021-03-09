@@ -27,8 +27,6 @@
 - byte code는 Runtime Data Area에 배치되어 실행, 필요에 따라 JVM이 쓰레드 동기화와 GC작업 수행
 - Execution engine을 통해 (기계어로 번역되어) 실행
 
-<br>
-
 #### JVM(Java Virtual Machine)의 구조
 
 - Class Loader
@@ -62,6 +60,8 @@
       - 현재 수행중인 JVM의 주소
     - Native Method Stack
       - 자바 외의 언어(C, C++)로 작성된 네이티브 코드(기계어)를 위한 영역
+
+<br>
 
 ### GC의 동작 원리
 
@@ -257,7 +257,7 @@
 
 <br>
 
-#### 추상클래스와 인터페이스
+### 추상클래스와 인터페이스
 
 **추상클래스**
 
