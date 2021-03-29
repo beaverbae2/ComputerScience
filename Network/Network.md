@@ -102,8 +102,9 @@
   - 다른 process로 데이터를 올바르게 보내기 위해 하는 작업
   - segment를 구성 하고, segment의 header 적절한 정보 표기
 - Demultiplexing
-  - 받은 segment를 socket에 올바로 보내는 작업
-
+  
+- 받은 segment를 socket에 올바로 보내는 작업
+  
 - UDP의 demultiplexing
   - connectionless
   - 확인 요소
@@ -137,6 +138,64 @@
 
 <br>
 
+#### RDT(Reliabe Data Tranfer) - 참고용
+
+> TCP의 reliable한 통신을 위해 간단한 상황을 만들어 TCP의 header나 기능으로 무엇이 필요한지 이해
+
+###### rdt의 기본 전제 
+
+- sender는 패킷을 보내기만 하고 receiver는 받기만함
+- 패킷은 **하나씩** 보냄
+
+#### rdt 1.0 
+
+- 완벽함, 할것이 없음
+
+#### rdt 2.0
+
+- 상황 : error발생
+- 해결 
+  - checksum : 제대로된 패킷인지 확인
+  - ack : receiver가 sender에게 잘 받았다고 보냄
+  - nak : receiver가 sender에게 못 받았다고 보냄
+- header : checksunm ack, nak
+
+#### rdt 2.1
+
+- 상황 
+  - rdt 2.0에서 문제점 발생
+  - ack나 nak가 유실 된다면?
+    - sender는 계속 재전송
+    - receiver는 패킷의 순서를 파악 못함
+- 해결
+  - sequence number
+    - 패킷의 번호
+    - **순서 파악 가능**
+    - receiver 측에서 중복된 번호의 패킷은 버리고 ack만 함
+- header : checksum, ack, nak, #seq
+
+#### rdt 2.2
+
+- 상황
+  - nak가 필요한가 -> 최적화
+- 해결
+  - receiver에서 응답시 **ack+#seq** 보냄
+  - ex) ack 0 : 0번 잘 받았음
+- header : checksum, ack, #seq
+
+#### rdt 3.0
+
+- 상황
+  - 패킷 loss(유실) 발생 -> 재전송 필요
+- 해결
+  - timer 설정
+    - 효율적으로 설정
+    - timeout 되면 sender측에서 패킷 재전송
+- header : checksum, ack, #seq
+- 기능 : timer
+
+<br>
+
 #### TCP
 
 - 특징
@@ -164,6 +223,6 @@
 
 - Four-way handshake (종료)
   - FIN (c->s) : 끝낼꼐유
-  - ACK(s->c) : ㅇㅋ보낸 데이터 다 받을 때까지 기다릴께유
+  - ACK(s->c) : ㅇㅋ, 남은 데이터 보낼께유
   - FIN (s->c) : 끝났슈
   - ACK(c->s) : ㅇㅋㅇㅋ (client는 time wait 상태 -> 서버로 부터 받지 못한 data 기다림)
