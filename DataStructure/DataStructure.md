@@ -32,7 +32,7 @@
 - **순회**
   - PreOrder(전위순회) : parent -> left -> right
   - InOrder(중위순회) : left -> parent -> right
-  - PostOrder(후위순회) : left -> right -> parent
+  - PostOrder(후위순회) : left -> right -> parent **(루트노드가 맨마지막)**
 
 ### Binary Search Tree
 
