@@ -147,11 +147,11 @@
 - sender는 패킷을 보내기만 하고 receiver는 받기만함
 - 패킷은 **하나씩** 보냄
 
-#### rdt 1.0 
+##### rdt 1.0 
 
 - 완벽함, 할것이 없음
 
-#### rdt 2.0
+##### rdt 2.0
 
 - 상황 : error발생
 - 해결 
@@ -160,7 +160,7 @@
   - nak : receiver가 sender에게 못 받았다고 보냄
 - header : checksunm ack, nak
 
-#### rdt 2.1
+##### rdt 2.1
 
 - 상황 
   - rdt 2.0에서 문제점 발생
@@ -183,7 +183,7 @@
   - ex) ack 0 : 0번 잘 받았음
 - header : checksum, ack, #seq
 
-#### rdt 3.0
+##### rdt 3.0
 
 - 상황
   - 패킷 loss(유실) 발생 -> 재전송 필요
@@ -226,3 +226,37 @@
   - ACK(s->c) : ㅇㅋ, 남은 데이터 보낼께유
   - FIN (s->c) : 끝났슈
   - ACK(c->s) : ㅇㅋㅇㅋ (client는 time wait 상태 -> 서버로 부터 받지 못한 data 기다림)
+
+<br>
+
+#### TCP : reliable transfer
+
+> 신뢰할 수 없는 채널을 가진 상황에서, TCP가 신뢰성 있는 전송을 함
+
+-  sequence number와 ack
+  - #seq : segment의 첫번째 바이트 값
+  - ack : **cumulative ack** -> ex) ack #100 : 99번까지 잘 받았다, 100번 줘!!!
+- RTT(Round Trip Time)와 timeout
+  - RTT : semgent 하나가 receiver에게 전달되고 ack가 sender에게 올 때까지 걸리는 시간
+  - timeout 설정
+    - timeout 발생하면 해당 segment를 재전송
+    - timeout = sample RTT + margin
+    - sample RTT를 구할 때 재전송한 것은 포함하지 않음
+- reliable transfer
+  - 두 소켓 간의 TCP가 성립되면
+    - 양쪽에 SEND BUFFER. RCV BUFFER생성
+    - SEND BUFFER : **재전송**을 위해 임시 저장
+      - SEND BASE : SEND BUFFER의 맨 앞 부분
+        - ack를 잘 받았으면 SEND BASE가 다음으로 이동
+      - timer : SEND BASE에 존재 -> 재전송 용도
+    - RCV BUFFER : **in-order**하게 segment를 전달
+      - 중간에 segment가 유실된 경우 올때까지 기다렸다가 순서 맞으면 자신의 소켓에 전송
+  - pipelined segments
+    - SENDER BUFFER에서 window size 만큼 segment들 전송
+  - cumulative ack
+    - 각 segment마다 ack하는 것이 아니고 한번에 다 받고 다음에 받아야하는 #seq를 ack에 담아서 보냄
+    - 중간에 segment가 유실된 경우 #seq가 더 큰 segment가 와도 유실된 segment의 #seq를 ack로 보냄
+
+- fast retransmission 
+  - 중복된 ack가 3번 (**실제로 4번**)오면 재전송함
+  - timeout발생해서 재전송하는 것보다 빠름
