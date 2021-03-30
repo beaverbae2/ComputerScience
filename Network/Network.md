@@ -244,7 +244,7 @@
     - sample RTT를 구할 때 재전송한 것은 포함하지 않음
 - reliable transfer
   - 두 소켓 간의 TCP가 성립되면
-    - 양쪽에 SEND BUFFER. RCV BUFFER생성(bi-directional, full duplex)
+    - 양쪽에 SEND BUFFER. RCV BUFFER생성(**bi-directional, full duplex**)
     - SEND BUFFER : **재전송**을 위해 임시 저장
       - SEND BASE : SEND BUFFER의 맨 앞 부분
         - ack를 잘 받았으면 SEND BASE가 다음으로 이동
