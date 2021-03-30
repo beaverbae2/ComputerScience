@@ -234,7 +234,7 @@
 > 신뢰할 수 없는 채널을 가진 상황에서, TCP가 신뢰성 있는 전송을 함
 
 -  sequence number와 ACK
-  - segment를 순서대로 보내기 위해 사용
+  -  segment를 순서대로 보내기 위해 사용
   -  #seq : segment의 첫번째 바이트 값
   -  ACK : **cumulative ACK** -> ex) ACK #100 : 99번까지 잘 받았다, 100번 줘!!!
   -  **하나의 segment에 대한 ACK를 바로바로 보내준다**
@@ -260,7 +260,6 @@
     - ack #N : N-1번까지 잘 받은 상태, N번을 받아야되는 상태
     - segment 각각에 대하여 ack를 보냄
     - 중간에 segment가 유실된 경우 #seq가 더 큰 segment가 와도 유실된 segment의 #seq를 ack로 보냄
-
 - fast retransmission 
   - 중복된 ack가 3번 (**실제로 4번**)오면 재전송함
   - timeout발생해서 재전송하는 것보다 빠름
