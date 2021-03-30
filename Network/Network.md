@@ -234,10 +234,10 @@
 > 신뢰할 수 없는 채널을 가진 상황에서, TCP가 신뢰성 있는 전송을 함
 
 -  sequence number와 ACK
-  -  segment를 순서대로 보내기 위해 사용
-  -  #seq : segment의 첫번째 바이트 값
-  -  ACK : **cumulative ACK** -> ex) ACK #100 : 99번까지 잘 받았다, 100번 줘!!!
-  -  **하나의 segment에 대한 ACK를 바로바로 보내준다**
+    - segment를 순서대로 보내기 위해 사용
+    - #seq : segment의 첫번째 바이트 값
+    - ACK : **cumulative ACK** -> ex) ACK #100 : 99번까지 잘 받았다, 100번 줘!!!
+    - **하나의 segment에 대한 ACK를 바로바로 보내준다**
 
 - RTT(Round Trip Time)와 timeout
   - RTT : semgent 하나가 receiver에게 전달되고 ack가 sender에게 올 때까지 걸리는 시간
