@@ -233,13 +233,15 @@
 
 > 신뢰할 수 없는 채널을 가진 상황에서, TCP가 신뢰성 있는 전송을 함
 
--  sequence number와 ack
+-  sequence number와 ACK
+  - segment를 순서대로 보내기 위해 사용
   - #seq : segment의 첫번째 바이트 값
-  - ack : **cumulative ack** -> ex) ack #100 : 99번까지 잘 받았다, 100번 줘!!!
+  - ACK : **cumulative ACK** -> ex) ACK #100 : 99번까지 잘 받았다, 100번 줘!!!
+  - **하나의 segment에 대한 ACK를 바로바로 보내준다**
 - RTT(Round Trip Time)와 timeout
   - RTT : semgent 하나가 receiver에게 전달되고 ack가 sender에게 올 때까지 걸리는 시간
   - timeout 설정
-    - timeout 발생하면 해당 segment를 재전송
+    - timeout 발생하면 해당 segment를 **재전송**
     - timeout = sample RTT + margin
     - sample RTT를 구할 때 재전송한 것은 포함하지 않음
 - reliable transfer
@@ -247,16 +249,73 @@
     - 양쪽에 SEND BUFFER. RCV BUFFER생성(**bi-directional, full duplex**)
     - SEND BUFFER : **재전송**을 위해 임시 저장
       - SEND BASE : SEND BUFFER의 맨 앞 부분
-        - ack를 잘 받았으면 SEND BASE가 다음으로 이동
+        - ACK를 잘 받았으면 SEND BASE가 다음으로 이동
       - timer : SEND BASE에 존재 -> 재전송 용도
     - RCV BUFFER : **in-order**하게 segment를 전달
-      - 중간에 segment가 유실된 경우 올때까지 기다렸다가 순서 맞으면 자신의 소켓에 전송
+      - 중간에 segment가 유실된 경우 올때까지 기다렸다가 순서 맞으면 자신의 소켓(어플리케이션)에 전송
+      - 호출은 에플리케이션에 의해 발생
   - pipelined segments
     - SENDER BUFFER에서 window size 만큼 segment들 전송
-  - cumulative ack
-    - 각 segment마다 ack하는 것이 아니고 한번에 다 받고 다음에 받아야하는 #seq를 ack에 담아서 보냄
+  - cumulative ACK
+    - ack #N : N-1번까지 잘 받은 상태, N번을 받아야되는 상태
+    - segment 각각에 대하여 ack를 보냄
     - 중간에 segment가 유실된 경우 #seq가 더 큰 segment가 와도 유실된 segment의 #seq를 ack로 보냄
 
 - fast retransmission 
   - 중복된 ack가 3번 (**실제로 4번**)오면 재전송함
   - timeout발생해서 재전송하는 것보다 빠름
+
+<br>
+
+#### TCP : Flow Control
+
+- receiver의 상황에 맞게 sender측에서 segment 전송
+- **rwnd : RCV BUFFER에서 남아있는 공간의 크기**
+  - TCP header의 receive window에 rwnd의 크기가 담겨서 sender측에 전송된다
+  - corner case : rwnd = 0;
+    - sender측에서 segment를 보내지 않아 deadlock 발생할 수 있음
+    - 해결 : probe 패킷(41바이트(헤더 40바이트+데이터 1바이트)) 전송
+
+- Silly window syndrome -> segment사이즈를 어떻게 결정하는가
+
+  - segment사이즈는 클 수록 좋음 -> header크기에 대한 overhead감소
+
+  - MSS (Maximum Segment Size) : 1500byte
+
+  - **segment사이즈가 작아지는 경우**
+
+    - sender측의 앱에서 데이터를 천천히 만들거나
+    - receiver측의 앱에서 받은 데이터 처리가 늦거나
+
+  - 참고
+
+    - Nagle 알고리즘(sender)
+      - 목적 : 최대한 큰 segment를 보내자
+      - 동작 방식
+        - 처음엔 sender에서 일단 데이터를 보냄
+        - sender에서 데이터를 모음 언제까지?
+          - ack를 받거나 : 네트워크 상황이 좋음
+          - MSS만큼 차거나 : buffer에 데이터를 담는게 더 빠름
+      - 장점 : 네트워크 효울성 증가(생산하는 segment 수가 적음)
+      - 단점 : ACK를 받을떄까지 대기하므로 전송 속도 느림
+
+    - Clark's solution(receiver) : rwnd가 MSS보다 작으면 0 취급
+    - Delayed ACK : ACK를 바로 보내지 않고, 일정시간 기다렸다가 보냄
+
+#### TCP : Connection Management
+
+- **3-way-handshake(시작)**
+
+  - SYN (c->s) : 계세요? (**header만 보냄**)
+  - SYN+ACK(s->c) : 예 있어요 (**header만 보냄**)
+  - ACK(c->s) : 데이터 보내유 (established)
+
+- **4-way handshake (종료)**
+
+  - FIN (c->s) : 끝낼꼐유
+  - ACK(s->c) : ㅇㅋㅇㅋ, client는 데이터 보내기 종료
+  - FIN (s->c) : 끝났슈
+  - ACK(c->s) : ㅇㅋㅇㅋ (client는 time wait 상태 - 자료 구조 해제X)
+
+  - **마지막에 time wait가 필요한 이유**
+    - cilent가 server로 보낸 ACK가 유실되면, server쪽에서 timeout이 발생하여 FIN을 다시 보냄
