@@ -302,14 +302,15 @@
     - Clark's solution(receiver) : rwnd가 MSS보다 작으면 0 취급
     - Delayed ACK : ACK를 바로 보내지 않고, 일정시간 기다렸다가 보냄
 
+<br>
+
 #### TCP : Connection Management
 
 - **3-way-handshake(시작)**
-
-  - SYN (c->s) : 계세요? (**header만 보냄**)
+- SYN (c->s) : 계세요? (**header만 보냄**)
   - SYN+ACK(s->c) : 예 있어요 (**header만 보냄**)
   - ACK(c->s) : 데이터 보내유 (established)
-
+  
 - **4-way handshake (종료)**
 
   - FIN (c->s) : 끝낼꼐유
@@ -319,3 +320,33 @@
 
   - **마지막에 time wait가 필요한 이유**
     - cilent가 server로 보낸 ACK가 유실되면, server쪽에서 timeout이 발생하여 FIN을 다시 보냄
+
+<br>
+
+#### TCP : congestion control
+
+> network 혼잡 상황에 맞게 보내는 패킷의 양을 조절
+
+- congestion control이 없는 경우
+  - 네트워크 패킷 증가로 인한 혼잡 발생
+  - 재전송 발생 -> 더 많은 패킷 발생
+  - 라우터 혼잡도 더욱 증가
+  - 뻥......
+- cwnd 
+  - 현재 혼잡도를 가진 네트워크에 보낼 수 있는 패킷 수
+  - 초기화 : 1MSS
+  - sender의 window size = MIN(cwnd, rwnd)
+- congestion control의 기본 철학
+  - additive increase : 패킷 증가는 선형적으로 천천히
+  - multiplicative decrease : loss 발생하면 보내는 패킷 수 **절반**으로 확 줄임
+- slow start
+  - 맨 처음에 패킷을 보낼 땐 1 MSS
+  - ssthresh(slow start thresh)에 도달하면 additive increase
+- 패킷의 loss
+  - 경우의 수
+    - timer 발생 or 3 dup ACK
+    - timer가 발생한 상황이 network 상황이 더 좋지 않다
+  - TCP reno
+    - 초기 TCP tahoe에서는 loss가 발생하면 다음 패킷은 1MSS 부터 보냄
+    - reno에선 3 dup ACK 발생한 경우는 multiplicative decrease 적용
+  - 참고 : loss 발생 후 ssthresh는 (이전에 보낸 패킷 수/2) 
