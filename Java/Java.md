@@ -25,22 +25,16 @@
 - javac(자바 컴파일러)가 .java -> .class(byte code)로 변환
 - Class Loader가 .class 파일 받아서 Runtime Data Area로 전달
 - byte code는 Runtime Data Area에 배치되어 실행, 필요에 따라 JVM이 쓰레드 동기화와 GC작업 수행
-- Execution engine을 통해 (기계어로 번역되어) 실행
+- Execution Engine을 통해 (기계어로 번역되어) 실행
 
 #### JVM(Java Virtual Machine)의 구조
 
 - Class Loader
-  - java compiler가 변환한 .class(byte code) 파일 로딩하여 Runtime Data Area로 보냄
-- Execution Collector
-  - .class 파일을 기계어로 번역후 명령어 실행
-  - 명령어 실행 방법
-    - Interpreter : 하나씩 실행
-    - JIT : 특정 시간에 전체 byte code를 native code로 변환
-- Garbage Collector
-  - heap에 있는 객체 중 참조 되지 않는 객체 삭제
+  - .class(byte code) 파일을 **동적로딩**하여 Runtime Data Area(Method Area)로 보냄
+  - 동적 로딩 : 모든 클래스를 다 로딩하는게 아니고 필요한 클래스만 로딩
 - Runtime Data Area
-  - JVM에 운영체제로 부터 할당 받은 메모리 영역
-  - 모든 쓰레드가 공유
+  - JVM이 운영체제로 부터 할당 받은 메모리 영역
+  - 모든 쓰레드가 공유하는 영역
     - Method Area
       - JVM 시작시 실행
       - byte code 저장
@@ -48,6 +42,9 @@
         - field :  멤버 변수명, 타입, 접근제어자
         - method : 메소드 명, 리턴 타입, 접근제어자
         - type : 클래스인지 인터페이스 인지
+      - runtime contraint pool
+        - 클래스 구성 요소들의 주소 저장
+        - 메소드나 필드 주소를 이곳에서 참조
     - Heap Area
       - new 로 생산된 객체를 저장하는 영역, GC의 대상
   - 각 쓰레드 별 생성
@@ -60,6 +57,17 @@
       - 현재 수행중인 JVM의 주소
     - Native Method Stack
       - 자바 외의 언어(C, C++)로 작성된 네이티브 코드(기계어)를 위한 영역
+  
+- Execution Engine
+  - .class(byte code) 파일을 기계어(native code)로 번역(compile)후 명령어 실행
+  - 명령어 실행 방법
+    - Interpreter : 하나씩 실행
+    - JIT : 특정 시간에 전체 byte code를 native code로 변환
+    - compile 비교
+      - javac : source code -> byte code
+      - interpreter : byte code -> native code 
+  - Garbage Collector
+    - heap에 있는 객체 중 참조 되지 않는 객체 삭제
 
 <br>
 
