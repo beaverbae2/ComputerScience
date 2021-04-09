@@ -76,67 +76,80 @@
 참고 자료
 
 - [우아한Tech - Garbage Collector](https://www.youtube.com/watch?v=vZRmCbl871I)
+- [Naver D2 - Java Garbage Collection](https://d2.naver.com/helloworld/1329)
+- [(JVM) Garbage Collection Advanced](https://perfectacle.github.io/2019/05/11/jvm-gc-advanced/)
 
-#### 구조
+#### Heap의 구조
 
 - Young(New) Generation 영역 : Eden, Survivor0, Survivor1
 - Old Generation 영역 : Old
 
 #### 과정
 
-- **Mark and Sweap**
+**Stop the world**
+
+- GC 발생시, GC 스레드를 제외한 모든 스레드가 멈추는 것
+- **GC의 성능은 stop the world를 얼만큼 줄일 수 있느냐에 비례**
+
+**Mark and Sweap**
 
 - Mark
-  - GC가 Stack의 모든 변수를 스캔하며 각각 어떤 객체를 참조하고 있는지 찾아서 마킹
-  - Reachable Object(ex) List의 요소)가 참조하고 있는 객체도 찾아서 마킹
+  - GC가 **Stack의 모든 변수를 스캔**하며 각각 어떤 객체를 참조하고 있는지 찾아서 마킹
+  - 즉, **Reachable한 객체를 찾아서 마킹**
 - Sweap
-  - Mark되지 않은 객체를 Heap에서 삭제
+  - **Mark되지 않은 객체를 Heap에서 삭제**
+- GC가 발생한다 == Mark and Sweap
 
 #### Minor GC
 
 - Young 영역(Eden, Survivor0, Survivor1)에서 발생 
 - 동작과정
   - 요약
-    - Eden : 객체가 쌓이는 곳, 이곳이 꽉차면 GC 발생
-    - Survivor : GC 발생(Mark and Sweap) 후 남은 객체들이 쌓이는 곳
-      - Survivor0, Surivivor1 둘 중 하나만 쓰인다
-  - 구체적인 과정 (구구절절 주의.....)
-    - Eden에 객체들이 쌓임
-    - Eden이 꽉참, Mark and Sweap 발생, 남은 객체들은 Survivor0으로 이동
-    - Eden에 또 객체들이 쌓이고 Mark and Sweap,  이번엔 Survivor0까지 꽉참
-    - Survivor0에서 Mark and Sweap  발생, 남은 객체들은 Survivor1로 이동 후 age 증가, Survivor0 비워짐
-    - Eden에 또 객체들이 쌓이고 Mark and Sweap, 이번엔 Survivor1꽉참
-    - Survivor1에서 Mark and Sweap  발생, 남은 객체들은 Survivor0로 이동 후 age 증가, Survivor1 비워짐
-    - age가 특정값이 다다른 객체들은 Old로 이동(**Promotion**)
-    - 위의 과정들 반복
+    - Eden : 생성된 객체가 쌓이는 곳, 이곳이 꽉차면 GC 발생
+    - Survivor : GC 발생 후 남은 객체들이 쌓이는 곳
+      - **Survivor0, Surivivor1 둘 중 하나만 쓰인다**
+  - 구체적인 과정 
+    - 새로 생성한  Eden에 쌓임
+    - Eden 영역에서 GC 발생, 살아 남은 객체는 Survivor영역중 하나로 이동
+    - 살아남은 객체들이 Survivor에 지속적으로 쌓임
+    - 하나의 Survivor 영역이 가득차게 되면 GC 발생, 살아남은 객체는 다른 Survivor 영역으로 이동(**age 증가**)
+    - 이 과정을 지속적으로 반복하다 계속 살아 있는 객체들은 Old 영역으로 이동 
 
 #### Major GC(Full GC)
 
 - Old 영역에서 발생
-- Stop-the- World : GC를 실행하기 위해 GC 쓰레드를 제외한 나머지 쓰레드 작업 중단
 - 종류
   - Serial GC
     - GC를 처리하는 쓰레드가 한 개, 시간이 오래 걸림
-    - Mark-Sweap-Compact
+    - Mark-Sweap-Compact 
       - Mark and Sweap 하는건 동일
-      - Compact : 파편화된 할당 메모리 한쪽으로 모음
+      - Compact : 파편화된 할당 메모리 한쪽으로 모음(살아있는 객체들이 메모리에 연속되게 존재하도록 함)
+    
   - Parallel GC
     - Serial GC와 동일, 단 GC 처리 쓰레드가 여러개
     - java8 default GC
+    
   - CMS(Concurrent Mark Sweap) GC 
     - 과정
-      - Initial mark : stack에서 객체를 참조하는 변수 마킹
-      - Concurrent mark : reachable한 객체들이 참조하는 객체들을 따라가며 마킹
-      - Remark : Concurrent mark 기간에 놓친 객체 다시 마킹
-      - Concurrent Sweap :  객체 제거
+
+      - Initial mark :  **stack에서 참조**하는 reachable한 객체 마킹 (stop the world)
+
+      - Concurrent mark : intial mark때 확인했던 **reachable한 객체들이 참조하는 객체들을 따라가며 마킹** (stop the world X (다른 쓰레드들도 진행 중))
+      - Remark : Concurrent mark 단계에서 새로 추가되거나 참조가 끊긴 객체 확인 -> 최종적으로 reachable한 객체 확인 (stop the world)
+      - Concurrent Sweap :  객체 제거 (stop the world X)
+
     - 특징
-      - Stop-the-World 기간을 줄임
+      - Stop-the-World 기간을 줄임 -> 빠름
       - Compact알고리즘 진행X
+
   - G1 GC
+    
+    - 기존 GC 원리와 다름
     - heap 영역을 고정된 크기의 영역으로 나눔
-    - 영역이 꽉차면 다른 빈 영역에 객체 할당 후, GC 실행
+    - 이 영역에 객체를 할당
+    - 영역이 꽉차면 다른 빈 영역에서 객체 할당 하게 되고, **해당 영역에 대해서만 GC 실행**
     - 특징
-      - Stop-the-World 기간을 줄임
+      - Stop-the-World 기간을 줄임 -> 빠름
       - Compact알고리즘 진행
 
 <br>
