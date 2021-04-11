@@ -269,7 +269,7 @@
     - receiver 측에서 중복된 번호의 패킷은 버리고 ack만 함
 - header : checksum, ack, nak, #seq
 
-#### rdt 2.2
+##### rdt 2.2
 
 - 상황
   - nak가 필요한가 -> 최적화
