@@ -75,6 +75,47 @@
 
 <br>
 
+### HTTP와 HTTPS
+
+**참고자료**
+
+- [망나니 개발자 - [Web] HTTP와 HTTPS 및 차이점](https://mangkyu.tistory.com/98)
+
+- [한재엽님 블로그](https://github.com/JaeYeopHan/Interview_Question_for_Beginner/tree/master/Network)
+
+<br>
+
+**HTTP의 문제점** 
+
+- 암호화되지 않은 평문 데이터를 보낸다
+- 제 3자가 데이터 확인 가능 -> 정보 유출
+
+<br>
+
+**HTTPS 란**
+
+- S : secure -> HTTP 데이터에 암호화가 추가(공개키 암호화)
+- HTTP 통신하는 소켓 부분을 SSL(Secure Socket Layer)또는 TSL(Transport Socket Layer)로 대체
+  - HTTP는 TCP 소켓과 직접 통신
+  - HTTPS는 SSL과 통신, SSL이 TCP와 통신
+- 포트번호
+  - HTTP : 80
+  - HTTPS : 433
+- 공개키와 개인키
+  - 공개키 : 모두에게 공개
+  - 개인키 : 개인만 가지고 있어야되는 키
+  - 공개키로 암호화된 데이터는 개인키로 복호화, 개인키로 암호화된 것은 공개키로 복호화
+  - 클라이언트는 공개키로 데이터를 암호화하여 서버에 요청
+- 동작 과정 
+  - A기업은 HTTP 기반의 애플리케이션에 HTTPS를 적용하기 위해 공개키/개인키를 발급함
+  - CA 기업에게 돈을 지불하고, 공개키를 저장하는 인증서의 발급을 요청함
+  - CA 기업은 CA기업의 이름, 서버의 공개키, 서버의 정보 등을 기반으로 인증서를 생성하고, CA 기업의 개인키로 암호화하여 A기업에게 이를 제공함
+  - A기업은 클라이언트에게 암호화된 인증서 제공
+  - 브라우저는 CA기업의 공개키를 미리 다운받아 갖고 있어, 암호화된 인증서를 복호화함
+  - 암호화된 인증서를 복호화하여 얻은 A기업의 공개키로 데이터를 암호화하여 요청 전송
+
+<br>
+
 ### Cookie와 Session
 
 **참고자료**
@@ -157,21 +198,21 @@
   - segment를 구성 하고, segment의 header 적절한 정보 표기
 - Demultiplexing
   
-- 받은 segment를 socket에 올바로 보내는 작업
+  - 받은 segment를 socket에 올바로 보내는 작업
+    
+  - UDP의 demultiplexing
+    - connectionless
+    - 확인 요소
+      - dest IP
+      - dest port
   
-- UDP의 demultiplexing
-  - connectionless
-  - 확인 요소
-    - dest IP
-    - dest port
-
-- TCP의 demultiplexing
-  - connection-oriented
-  - 확인요소
-    - src IP
-    - src port
-    - dest IP
-    - dest port
+  - TCP의 demultiplexing
+    - connection-oriented
+    - 확인요소
+      - src IP
+      - src port
+      - dest IP
+      - dest port
 
 <br>
 
@@ -212,7 +253,7 @@
   - checksum : 제대로된 패킷인지 확인
   - ack : receiver가 sender에게 잘 받았다고 보냄
   - nak : receiver가 sender에게 못 받았다고 보냄
-- header : checksunm ack, nak
+- header : checksum ack, nak
 
 ##### rdt 2.1
 
