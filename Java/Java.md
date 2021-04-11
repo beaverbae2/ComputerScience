@@ -151,6 +151,7 @@
     - 특징
       - Stop-the-World 기간을 줄임 -> 빠름
       - Compact알고리즘 진행
+      - java9 부터 default GC
 
 <br>
 
