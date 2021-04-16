@@ -7,6 +7,7 @@
 - [final static abstract](#final-static-abstract)
 - [추상클래스와 인터페이스](#추상클래스와-인터페이스)
 - [예외처리](#예외처리)
+- [직렬화](#직렬화)
 
 <br>
 
@@ -456,3 +457,181 @@
       
       ```
 
+<br>
+
+### 직렬화
+
+- 참고 자료
+  - [Nesoy Blog - Java의 직렬화란?](https://nesoy.github.io/articles/2018-04/Java-Serialize)
+  - [Stop the world - Java 객체 직렬화와 역직렬화](https://flowarc.tistory.com/entry/Java-%EA%B0%9D%EC%B2%B4-%EC%A7%81%EB%A0%AC%ED%99%94Serialization-%EC%99%80-%EC%97%AD%EC%A7%81%EB%A0%AC%ED%99%94Deserialization)
+  - Java의 정석 직렬화Part (p.934~p.944)
+- 직렬화, 역직렬화
+  - 직렬화 : 객체나 데이터를 byte형태로 변환
+  - 역직렬화 : byte형태의 데이터를 객체나 데이터로 변환
+  - 객체를 저장했다가 다시 꺼내쓸 때, 또는 서로 간의 객체를 주고 받기 위해 직렬화 사용
+
+- 구현
+
+  - 직렬화
+
+    - 조건 - `java.io.Serializable` 상속
+
+      ```java
+      class UserInfo implements Serializable {
+      	String name;
+      	transient String password;
+      	int age;
+      	
+      	public UserInfo(String name, String password, int age) {
+      		this.name = name;
+      		this.password = password;
+      		this.age = age;
+      	}
+      
+      	@Override
+      	public String toString() {
+      		return "UserInfo [name=" + name + ", age=" + age + "]";
+      	}
+      }
+      ```
+
+    - 방법 - `java.io.ObjectOutputStream` 사용
+
+      ```java
+      import java.io.BufferedOutputStream;
+      import java.io.FileOutputStream;
+      import java.io.IOException;
+      import java.io.ObjectOutputStream;
+      import java.io.Serializable;
+      import java.util.ArrayList;
+      
+      public class SerializeTest {
+      	public static void main(String[] args) {
+      		try {
+      			String fileName = "UserInfo.dat";
+      			FileOutputStream fos = new FileOutputStream(fileName);
+      			BufferedOutputStream bos = new BufferedOutputStream(fos);
+      			
+      			ObjectOutputStream oos = new ObjectOutputStream(bos);
+      			
+      			UserInfo u1 = new UserInfo("beaver1", "1234", 32);
+      			UserInfo u2 = new UserInfo("beaver2", "4321", 13);
+      			ArrayList<UserInfo> list = new ArrayList<>();
+      			list.add(u1);
+      			list.add(u2);
+      			
+      			// 직렬화 수행
+      			oos.writeObject(u1);
+      			oos.writeObject(u2);
+      			oos.writeObject(list);
+      			oos.close();
+      			System.out.println("직렬화 종료");
+      		} catch (IOException e) {
+      			e.printStackTrace();
+      		}
+      	}
+      }
+      ```
+
+    - 역직렬화
+
+      - 조건
+
+        - 직렬화와 역직렬화를 진행하는 시스템이 서로 다를 수 있음을 인지
+
+        - 동일한 `serialVersionUID`를 가지고 있어야 함
+
+          - `serialVersionUID`는 클래스가 변경(메소드 or 필드 변경) 될 때마다 변경
+          - 그렇기에 일반적으로 클래스의 필드에 `serialVersionUID` 명시 동일한 값을 갖게 함
+
+          - `serialVersionUID`가 다를 경우 `java.io.InvalidClassException` 발생
+
+        - 직렬화할 때와 역직렬화 할 때의 순서는 동일해야 함
+
+      - 방법 - `java.io.ObjectInputStream` 사용
+
+        ```java
+        import java.io.BufferedInputStream;
+        import java.io.FileInputStream;
+        import java.io.ObjectInputStream;
+        import java.util.ArrayList;
+        
+        public class DeserializeTest {
+        	public static void main(String[] args) {
+        		try {
+        			String fileName = "UserInfo.dat";
+        			FileInputStream fis = new FileInputStream(fileName);
+        			BufferedInputStream bos = new BufferedInputStream(fis);
+        			
+        			ObjectInputStream ois = new ObjectInputStream(bos);
+        			
+        			UserInfo u1 = (UserInfo) ois.readObject();
+        			UserInfo u2 = (UserInfo) ois.readObject();			
+        			ArrayList<UserInfo> list = (ArrayList) ois.readObject();
+        			
+        			System.out.println(u1);
+        			System.out.println(u2);
+        			System.out.println(list);
+        			ois.close();
+        			System.out.println("역직렬화 종료");
+        		} catch (Exception e) {
+        			e.printStackTrace();
+        		}
+        	}
+        }
+        ```
+
+      -  `serialVersionUID` 적용
+
+        - **상황 - class의 구성 요소 변경**
+
+          ```java
+          class UserInfo implements Serializable {
+          	String name;
+          	transient String password;
+          	int age;
+          	String tel;// 중간에 추가된 필드
+          	
+          	public UserInfo(String name, String password, int age) {
+          		this.name = name;
+          		this.password = password;
+          		this.age = age;
+          	}
+          
+          	@Override
+          	public String toString() {
+          		return "UserInfo [name=" + name + ", age=" + age + "]";
+          	}
+          }
+          ```
+
+        - 실행 결과 : `java.io.InvalidClassException` 발생
+
+        - 해결  :  클래스에 `serialVersionUID` 명시 
+
+          ```java
+          class UserInfo implements Serializable {
+          	/**
+          	 * 
+          	 */
+          	private static final long serialVersionUID = 1L;//SUID 명시
+          	
+          	String name;
+          	transient String password;
+          	int age;
+          	String tel; 
+          	
+          	public UserInfo(String name, String password, int age) {
+          		this.name = name;
+          		this.password = password;
+          		this.age = age;
+          	}
+          
+          	@Override
+          	public String toString() {
+          		return "UserInfo [name=" + name + ", age=" + age + "]";
+          	}
+          }
+          ```
+
+          
