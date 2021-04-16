@@ -2,11 +2,11 @@
 
 - [JVM](#JVM)
 - [GC의 동작 원리](#GC의-동작-원리)
-
 - [객체 지향 프로그래밍](#객체-지향-프로그래밍)
 - [객체 지향의 4가지 특징](#객체-지향의-4가지-특징)
 - [final static abstract](#final-static-abstract)
 - [추상클래스와 인터페이스](#추상클래스와-인터페이스)
+- [예외처리](#예외처리)
 
 <br>
 
@@ -15,8 +15,6 @@
 **참고 자료**
 
 - [JVM](https://asfirstalways.tistory.com/158)
-- [GC](https://asfirstalways.tistory.com/159)
-- [GC의 과정](https://d2.naver.com/helloworld/1329)
 
 #### 자바 파일의 실행 과정
 
@@ -73,7 +71,7 @@
 
 ### GC의 동작 원리
 
-참고 자료
+**참고 자료**
 
 - [우아한Tech - Garbage Collector](https://www.youtube.com/watch?v=vZRmCbl871I)
 - [Naver D2 - Java Garbage Collection](https://d2.naver.com/helloworld/1329)
@@ -313,3 +311,148 @@
   - 추상클래스 : extends
   - 인터페이스 : implements
 - 인터페이스만 다중 상속 가능
+
+<br>
+
+### 예외처리
+
+- 참고 자료
+  - [기적을 만드는 기록 - 예외 & 예외 처리란?](https://jiwontip.tistory.com/5)
+
+- 에러와 예외
+  - 에러 : 수습 불가능한 오류
+  - 예외 : 수습가능한 다소 미약한 오류
+- 예외 클래스의 계층 구조
+  -  Throwable
+    - Exception
+      - (Checked Exception) - compile 시 확인
+        - IOException
+        - ....
+        - ClassNotFoundException
+      - (Unchecked Exception) RuntimeException - runtime 확인
+        - ArithmeticException
+        - NullPointerException
+        - ...
+        - IndexOutOfBoundException
+
+- 예외 처리 방법
+
+  - try-catch-finally
+
+    ```java
+    try {
+        // 예외를 처리하길 원하는 실행 코드 (예외가 발생할 수 있는 코드)
+    } catch (e1) {
+        // e1 예외가 발생시 실행되는 코드
+    } catch (e2) {
+        // e2 예외가 발생시 실행되는 코드
+    } finally {
+        // 예외 발생 여부와 관계 없이 실행 
+    }
+    ```
+
+  - throw, throws
+
+    - throw : 강제로 예외 발생 시키기
+    - throws : 메소드를 호출한 상위 메소드에서 예외를 처리
+
+    - 사용자 정의 예외 클래스 : Exception이나 RuntimeException 클래스를 상속받아 구현 
+
+    - 구현 예시
+
+      ```java
+      // 사용자 정의 스택 구현
+      public class Test {
+      	public static void main(String[] args) {
+      		MyStack stack = new MyStack(3);
+      		stack.push(1);
+      		stack.push(2);
+      		System.out.println(stack.pop());
+      		stack.push(3);
+      		stack.push(4);
+      		stack.push(5);
+      		System.out.println(stack.pop());
+      		System.out.println(stack.pop());
+      		System.out.println(stack.pop());
+      		System.out.println(stack.pop());
+      		System.out.println(stack.pop());
+      	}
+      }
+      
+      // 배열로 stack구현
+      class MyStack {
+      	int[] arr;
+      	int size;
+      	int top;
+      	
+      	{
+      		top = 0;
+      	}
+      	
+      	public MyStack(int size) {
+      		this.arr = new int[size];
+      		this.size = size; 
+      	}
+      	
+      	public void push(int data) throws FullException {// 이를 호출한 상위 메소드에서 예외 처리
+      		if (isFull()) {
+      			throw new FullException("stack is full!");// 예외발생 시키기
+      		} else {
+      			arr[top++] = data;
+      		}
+      	}
+      	
+      	public int pop() throws EmptyException {// 이를 호출한 상위 메소드에서 예외 처리
+      		if (isEmpty()) {
+      			throw new EmptyException("stack is empty!");// 예외발생 시키기
+      		} else {
+      			top--;
+      			return arr[top];
+      		}
+      	}
+      	
+      	public boolean isEmpty() {
+      		if (top == 0) return true;
+      		return false;
+      	}
+      	
+      	public boolean isFull() {
+      		if (top == size) return true;
+      		return false;
+      	}
+      }
+      
+      // 사용자 정의 예외 클래스 구현
+      class EmptyException extends RuntimeException{
+      	/**
+      	 * add this because Serializable
+      	 */
+      	private static final long serialVersionUID = 1L;
+      
+      	public EmptyException() {
+      		super();
+      	}
+      	
+      	public EmptyException(String msg) {
+      		super(msg);
+      	}
+      }
+      
+      // 사용자 정의 예외 클래스 구현
+      class FullException extends RuntimeException{
+      	/**
+      	 * add this because Serializable
+      	 */
+      	private static final long serialVersionUID = 1L;
+      
+      	public FullException() {
+      		super();
+      	}
+      	
+      	public FullException(String msg) {
+      		super(msg);
+      	}
+      }
+      
+      ```
+
