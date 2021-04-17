@@ -7,6 +7,7 @@
 - [final static abstract](#final-static-abstract)
 - [추상클래스와 인터페이스](#추상클래스와-인터페이스)
 - [예외처리](#예외처리)
+- [문자열 처리](#문자열-처리)
 - [직렬화](#직렬화)
 
 <br>
@@ -318,8 +319,9 @@
 ### 예외처리
 
 - 참고 자료
-  - [기적을 만드는 기록 - 예외 & 예외 처리란?](https://jiwontip.tistory.com/5)
-
+  
+- [기적을 만드는 기록 - 예외 & 예외 처리란?](https://jiwontip.tistory.com/5)
+  
 - 에러와 예외
   - 에러 : 수습 불가능한 오류
   - 예외 : 수습가능한 다소 미약한 오류
@@ -456,6 +458,74 @@
       }
       
       ```
+
+<br>
+
+### 문자열 처리
+
+#### String
+
+- 선언 : 내부적으로 char[]가 생성
+
+- 불변 **객체**
+
+  - 변경 불가능
+  - 읽기만 가능
+
+- 문자열 결합
+
+  ```java
+  String a = "a";
+  String b = "b";
+  a = a+b;// a에 "b"가 더해지는게 아닌 "ab"를 가지는 인스턴스 생성
+  ```
+
+- 문자열 리터럴
+
+  ```java
+  String a = "abc";
+  String b = "abc";
+  // a와 b의 주소는 같다
+  ```
+
+#### StringBuffer와 StringBuilder
+
+- StringBuffer
+
+  - 생성
+
+    ```java
+    public StringBuffer() {// 인자 없는 경우 capacity 16으로 초기화
+        super(16);
+    }
+    
+    public StringBuffer(int capacity) {
+        super(capacity);
+    }
+    
+    public StringBuffer(CharSequence seq) {// capacity를 초과한 경우 +16해줌
+        this(seq.length() + 16);
+        append(seq);
+    }
+    ```
+
+  - 문자열 결합
+
+    ```java
+    StringBuffer sb = new StringBuffer();
+    sb.append("a").append("b").append("asddasd");
+    ```
+
+    - append()의 리턴 값은 StringBuffer의 주소
+    - **String은 새로운 문자열 리터럴이 생성될떄 마다 객체를 새로 생성, 반면 StringBuffer는 처음에 선언시에만 객체 생성**
+    - 문자열 결합이나 추출이 많을 경우 String보다 StringBuffer를 활용
+
+- StringBuilder
+
+  - StringBuffer랑  똑같음
+  - 차이점
+    - StringBuffer : 동기화 지원 -> 멀티쓰레드인 경우 사용
+    - StringBuilder : 동기화 지원X -> 싱글쓰레드인 경우 사용
 
 <br>
 
