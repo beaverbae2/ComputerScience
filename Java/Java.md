@@ -6,6 +6,7 @@
 - [객체 지향의 4가지 특징](#객체-지향의-4가지-특징)
 - [final static abstract](#final-static-abstract)
 - [추상클래스와 인터페이스](#추상클래스와-인터페이스)
+- [불변 객체(Immutable Object)](#불변-객체(Immutable-Object))
 - [예외처리](#예외처리)
 - [문자열 처리](#문자열-처리)
 - [직렬화](#직렬화)
@@ -313,6 +314,150 @@
   - 추상클래스 : extends
   - 인터페이스 : implements
 - 인터페이스만 다중 상속 가능
+
+<br>
+
+### 불변 객체(Immutable Object)
+
+- 참고자료
+
+  - [conatuseus.log - [Java] Immuatable Objec(불변객체)](https://velog.io/@conatuseus/Java-Immutable-Object%EB%B6%88%EB%B3%80%EA%B0%9D%EC%B2%B4)
+  - [자주와조요 - 불변 객체란?](https://velog.io/@kyle/%EB%B6%88%EB%B3%80-%EA%B0%9D%EC%B2%B4%EB%9E%80-Java-Immutable-Object)
+
+- 불변 객체란
+
+  - 한 번 생성 후, 외부에서 변경 불가능한 객체
+
+- 장단점
+
+  - 장점(사용목적)
+    - 객체 신뢰도 증가 : transaction 할 때 유용
+    - 생성자 및 접근 메소드에 대해 복사 방어 필요 없음
+    - 멀티스레드 환경에서 동기화 처리없이 객체 공유
+  - 단점
+    - 매번 새로운 객체가 필요 -> 메모리 누수 및 성능저하 발생
+
+- 구현
+
+  - 필드가 primitive type만 있는 경우 : setter사용X (필수), final 키워드 사용(선택)
+
+    ```java
+    class PrimitiveObject {
+    	final int value;
+    
+    	public PrimitiveObject(int value) {
+    		this.value = value;
+    	}
+    
+    	public int getValue() {
+    		return value;
+    	}
+    }
+    ```
+
+  - 필드에 reference type이 있는 경우
+
+    - 단일 객체만 있는 경우 : 해당 객체도 불변 객체로 생성
+
+      ```java
+      // 1. 필드에 단일 객체가 있는 경우
+      class ReferenceObject1 {
+      	private final Pair p;
+      
+      	public ReferenceObject1(Pair p) {
+      		this.p = p;
+      	}
+      
+      	public Pair getP() {
+      		return p;
+      	}
+      }
+      
+      // 참조 변수도 불변 객체여야 한다
+      class Pair {
+      	private final int r, c;
+      
+      	public Pair(int r, int c) {
+      		this.r = r;
+      		this.c = c;
+      	}
+      
+      	public int getR() {
+      		return r;
+      	}
+      
+      	public int getC() {
+      		return c;
+      	}
+      
+      	@Override
+      	public String toString() {
+      		return "Pair [r=" + r + ", c=" + c + "]";
+      	}
+      }
+      ```
+
+    - 배열이 있는 경우 
+
+      - 생성 : 인자로 들어오는 배열의 요소를 가지는 **새로운 배열 객체 생성**
+      - getter : 외부에서 수정 불가능하게 **원본과 다른 복사본을 생성**해서 리턴
+
+      ```java
+      //2. 필드에 배열이 있는 경우
+      class ReferenceObject2 {
+      	private final Pair[] arr;
+      	
+      	public ReferenceObject2(Pair[] arr) {
+      //		this.arr = arr; // 필드arr이 인자arr 주소를 참조 -> 인자arr의 값이 변경되면 필드arr의 값도 변경(not immutable) 
+      		this.arr = Arrays.copyOf(arr, arr.length); // 인자 arr의 요소를 갖는0 새로운 객체 생성 -> 필드arr와 인자arr의 주소가 다름 
+      	}
+      
+      	public Pair[] getArr() {
+      //		return arr;// 외부에서 변경 가능 
+      		return (arr == null) ? null : arr.clone();// 복사본 리턴 : 외부에서 변경해도 영향 없음
+      	}
+      }
+      ```
+
+    - List가 있는 경우
+
+      - 생성 : 인자로 들어오는 List의 요소를 가지는 **새로운 List 객체 생성**
+      - getter : 외부에서 수정 불가능하게 `Collections.unmodifiableList(List list);` 사용
+
+      ```java
+      //3. 필드에 리스트가 있는 경우
+      class ReferenceObject3 {
+      	private final List<Pair> list;
+      
+      	public ReferenceObject3(List<Pair> list) {
+      //		this.list = list; // 필드list가 인자list 주소를 참조 -> 인자list의 값이 변경되면 필드list의 값도 변경(not immutable) 
+      		this.list = new ArrayList<>(list);// 인자 list의 요소로 갖는 새로운 객체 생성 -> 필드list와 인자list의 주소가 다름 
+      	}
+      
+      	public List<Pair> getList() {
+      //		return list; // 외부에서 변경 가능
+      		return Collections.unmodifiableList(list);// 외부에서 변경 시도시 UnsupportedOperationException 발생
+      	}
+      }
+      ```
+
+- 참고
+  - final을 사용해도 일반적인 getter를 사용하면 배열이나 list 리턴 받고 수정 가능하다 -> 주소가 동일하기 때문
+
+- 요약
+
+  - 기본: setter X, final 사용
+
+  - primitive type
+    - 기본대로
+  - referrence type
+    - 단일 객체 : 참조하는 객체도 기본대로 불변객체로 생성
+    - 배열, 리스트
+      - 주소를 다르게 한다
+      - 생성시 인자로 들어오는 요소들을 똑같이 가지는 새로운 객체 생성
+      - getter 사용시 외부에서 변경 불가능하게 처리
+        - 배열 : 복사본을 따로 만들어서 보냄 (수정해도 원본에 영향X)
+        - List : `Collections.unmodifiableList(List list);` 로 변경 원천 차단
 
 <br>
 
