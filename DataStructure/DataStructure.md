@@ -82,6 +82,8 @@
 
 - 참고자료
   - [Heee's Blog - [자료구조] 힙(heap)이란](https://gmlwjd9405.github.io/2018/05/10/data-structure-heap.html)
+  - [ratgo's blog - 힙 정렬](https://ratsgo.github.io/data%20structure&algorithm/2017/09/27/heapsort/)
+  - [Jbee - Heap, Heapify, Heap Sort](https://asfirstalways.tistory.com/325)
 - Complete Binary Tree(완전 이진 트리)의 일종, 우선순위 큐를 구현하기 위해 만들어진 자료구조
 - 특징
   - 최솟값이나 최댓값을 빠르게 찾을 수 있음
@@ -94,26 +96,20 @@
 - 종류
   - 최소힙
     - 부모노드의 값 <= 자식 노드의 값
+    - root 가 제일 작다
   - 최대힙
     - 부모노드의 값 >= 자식 노드의 값
-- 구현 - 최소힙 기준
-  - 일반적으로 배열사용
-    - 부모 인덱스 : `idx`
-    - 왼쪽 자식 인덱스 : `2 * idx + 1`
-    - 오른쪽 자식 인덱스 : `2 * idx + 2` 
-  - 삽입
-    - 마지막 노드에 삽입
-    - `부모 노드 값 > 자식 노드`의 값이면 반복하며 swap
-  - 삭제
-    - 맨 앞 노드 삭제
-    - 초기화
-      - 맨 뒤 노드를 맨 앞(루트)으로 위치시킴
-      - 부모 노드를 루트 노드로 설정
-    -  탐색
-      - 자식 노드 중 더 작은 값을 가지는 노드 찾기
-      - `부모노드 >  위에서 찾은 값` 이면 부모 노드와 자식 노드를 swap
+    - root가 제일 크다
 
-[**최소힙 구현코드**](./Code/MinHeap.md)
+- **heapify**
+  - heap 구조를 유지하기 위해 하는 연산
+- heap sort
+  - 내용
+    - 최대힙으로 오름차순 정렬
+    - 최소힙으로 내림차순 정렬
+  - 시간 복잡도 : O(N logN)
+
+[**최대힙 구현코드**](./Code/MaxHeap.md)
 
 <br>
 
