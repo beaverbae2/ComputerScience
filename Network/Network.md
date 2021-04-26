@@ -336,7 +336,7 @@
         - **sliding window**
           - window size(**한 번에 보낼 수 있는 데이터 양**)  만큼 segment들을 한꺼번에 전송
           - ACK를 잘 받았으면 SEND BASE가 다음으로 이동(sliding)
-          - 반대) stop and wait : segment를 보내고 ack가 올바로 올때까지 기다림 
+          - 반대) stop and wait : segment를 하나 보내고 ack가 올바로 올때까지 기다림 
       - timer : SEND BASE에 존재 -> 재전송 용도
     - RCV BUFFER : **in-order**하게 segment를 전달
       - 중간에 segment가 유실된 경우 올때까지 기다렸다가 순서 맞으면 자신의 소켓(어플리케이션)에 전송
@@ -418,21 +418,41 @@
   - 재전송 발생 -> 더 많은 패킷 발생
   - 라우터 혼잡도 더욱 증가
   - 뻥......
+  
 - cwnd 
   - 현재 혼잡도를 가진 네트워크에 보낼 수 있는 패킷 수
   - 초기화 : 1MSS
   - sender의 window size = MIN(cwnd, rwnd)
+  
 - congestion control의 기본 철학
+  
+  - **많은 사람들이 네트워크를 골고루 사용할 수 있게 하자**
   - additive increase : 패킷 증가는 선형적으로 천천히
   - multiplicative decrease : loss 발생하면 보내는 패킷 수 **절반**으로 확 줄임
+  
 - slow start
   - 맨 처음에 패킷을 보낼 땐 1 MSS
-  - ssthresh(slow start thresh)에 도달하면 additive increase
+  - 이후 2배씩 증가(2^n)
+  - ssthresh(slow start threshold)에 도달하면 additive increase
+    - ssthresh = cwnd 크기 / 2
+      - 맨처음 TCP 통신 시작시 ssthresh = 0.5 MSS
+  
 - 패킷의 loss
   - 경우의 수
     - timer 발생 or 3 dup ACK
     - timer가 발생한 상황이 network 상황이 더 좋지 않다
+
+- congestion control의 방법
+
+  - TCP tahoe
+
+    - sshthresh까지는 slow start
+    - loss 발생시
+      - cwnd가 1로 초기화
+      - sshthresh = (loss 발생했을떄의 cwnd 크기) / 2
+
   - TCP reno
-    - 초기 TCP tahoe에서는 loss가 발생하면 다음 패킷은 1MSS 부터 보냄
-    - reno에선 3 dup ACK 발생한 경우는 multiplicative decrease 적용
-  - 참고 : loss 발생 후 ssthresh는 (이전에 보낸 패킷 수/2) 
+    - reno에선 3 dup ACK 발생한 경우는 multiplicative decrease 적용 -> cwnd를 반으로 줄임
+    - time out 발생시 tahoe와 동일하게 행동
+
+    
