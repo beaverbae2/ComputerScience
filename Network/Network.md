@@ -328,21 +328,24 @@
     - timeout 발생하면 해당 segment를 **재전송**
     - timeout = sample RTT + margin
     - sample RTT를 구할 때 재전송한 것은 포함하지 않음
-- reliable transfer
+-  reliable transfer
   - 두 소켓 간의 TCP가 성립되면
     - 양쪽에 SEND BUFFER. RCV BUFFER생성(**bi-directional, full duplex**)
     - SEND BUFFER : **재전송**을 위해 임시 저장
       - SEND BASE : SEND BUFFER의 맨 앞 부분
-        - ACK를 잘 받았으면 SEND BASE가 다음으로 이동
+        - **sliding window**
+          - window size(**한 번에 보낼 수 있는 데이터 양**)  만큼 segment들을 한꺼번에 전송
+          - ACK를 잘 받았으면 SEND BASE가 다음으로 이동(sliding)
+          - 반대) stop and wait : segment를 보내고 ack가 올바로 올때까지 기다림 
       - timer : SEND BASE에 존재 -> 재전송 용도
     - RCV BUFFER : **in-order**하게 segment를 전달
       - 중간에 segment가 유실된 경우 올때까지 기다렸다가 순서 맞으면 자신의 소켓(어플리케이션)에 전송
       - 호출은 에플리케이션에 의해 발생
   - pipelined segments
-    - SENDER BUFFER에서 window size 만큼 segment들 전송
+    - SENDER BUFFER에서 window size(**한 번에 보낼 수 있는 데이터 양**) 만큼 segment들 전송
   - cumulative ACK
     - ack #N : N-1번까지 잘 받은 상태, N번을 받아야되는 상태
-    - segment 각각에 대하여 ack를 보냄
+    - **segment 각각에 대하여 ack를 보냄**
     - 중간에 segment가 유실된 경우 #seq가 더 큰 segment가 와도 유실된 segment의 #seq를 ack로 보냄
 - fast retransmission 
   - 중복된 ack가 3번 (**실제로 4번**)오면 재전송함
