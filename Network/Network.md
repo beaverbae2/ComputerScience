@@ -259,7 +259,7 @@
 
 - 상황 
   - rdt 2.0에서 문제점 발생
-  - ack나 nak가 유실 된다면?
+  - ack나 nak에 error가 있다면?
     - sender는 계속 재전송
     - receiver는 패킷의 순서를 파악 못함
 - 해결
