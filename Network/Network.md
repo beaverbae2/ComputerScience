@@ -309,18 +309,6 @@
   - flag (SYN, FIN)
   - ....
 
-- [handshake 참고링크](https://asfirstalways.tistory.com/356)
-
-- Three-way handshake (시작)
-  - SYN (c->s) : 계세요?
-  - SYN+ACK(s->c) : 예 있어요
-  - ACK(c->s) : 데이터 보내유 (established)
-
-- Four-way handshake (종료)
-  - FIN (c->s) : 끝낼꼐유
-  - ACK(s->c) : ㅇㅋ, 남은 데이터 보낼께유
-  - FIN (s->c) : 끝났슈
-  - ACK(c->s) : ㅇㅋㅇㅋ (client는 time wait 상태 -> 서버로 부터 받지 못한 data 기다림)
 
 <br>
 
