@@ -442,8 +442,9 @@
       ```
 
 - 참고
-  - final을 사용해도 일반적인 getter를 사용하면 배열이나 list 리턴 받고 수정 가능하다 -> 주소가 동일하기 때문
-
+  
+- final을 사용해도 일반적인 getter를 사용하면 배열이나 list 리턴 받고 수정 가능하다 -> 주소가 동일하기 때문
+  
 - 요약
 
   - 기본: setter X, final 사용
@@ -758,8 +759,8 @@
 
           - `serialVersionUID`는 클래스가 변경(메소드 or 필드 변경) 될 때마다 변경
           - 그렇기에 일반적으로 클래스의 필드에 `serialVersionUID` 명시 동일한 값을 갖게 함
-
-          - `serialVersionUID`가 다를 경우 `java.io.InvalidClassException` 발생
+- `serialVersionUID`가 다를 경우 `java.io.InvalidClassException` 발생
+          - `serialVersionUID` 가 같아도 변수의 type이 달리진 경우 역직렬화 불가
 
         - 직렬화할 때와 역직렬화 할 때의 순서는 동일해야 함
 
