@@ -361,18 +361,13 @@
   - corner case : rwnd = 0;
     - sender측에서 segment를 보내지 않아 deadlock 발생할 수 있음
     - 해결 : probe 패킷(41바이트(헤더 40바이트+데이터 1바이트)) 전송
-
 - Silly window syndrome -> segment사이즈를 어떻게 결정하는가
-
-  - segment사이즈는 클 수록 좋음 -> header크기에 대한 overhead감소
-
-  - MSS (Maximum Segment Size) : 1500byte
-
   - **segment사이즈가 작아지는 경우**
 
     - sender측의 앱에서 데이터를 천천히 만들거나
     - receiver측의 앱에서 받은 데이터 처리가 늦거나
-
+  - segment사이즈는 클 수록 좋음 -> header크기에 대한 overhead감소
+  - MSS (Maximum Segment Size) : 1500byte
   - 참고
 
     - Nagle 알고리즘(sender)
@@ -386,7 +381,7 @@
       - 단점 : ACK를 받을떄까지 대기하므로 전송 속도 느림
 
     - Clark's solution(receiver) : rwnd가 MSS보다 작으면 0 취급
-    - Delayed ACK : ACK를 바로 보내지 않고, 일정시간 기다렸다가 보냄
+    - Delayed ACK : ACK를 바로 보내지 않고, rwnd가 넉넉해질 떄까지 일정시간 기다렸다가 보냄
 
 <br>
 
