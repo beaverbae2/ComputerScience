@@ -759,7 +759,7 @@
 
           - `serialVersionUID`는 클래스가 변경(메소드 or 필드 변경) 될 때마다 변경
           - 그렇기에 일반적으로 클래스의 필드에 `serialVersionUID` 명시 동일한 값을 갖게 함
-- `serialVersionUID`가 다를 경우 `java.io.InvalidClassException` 발생
+          - `serialVersionUID`가 다를 경우 `java.io.InvalidClassException` 발생
           - `serialVersionUID` 가 같아도 변수의 type이 달리진 경우 역직렬화 불가
 
         - 직렬화할 때와 역직렬화 할 때의 순서는 동일해야 함
@@ -799,55 +799,55 @@
 
       -  `serialVersionUID` 적용
 
-        - **상황 - class의 구성 요소 변경**
+          - **상황 - class의 구성 요소 변경**
 
-          ```java
-          class UserInfo implements Serializable {
-          	String name;
-          	transient String password;
-          	int age;
-          	String tel;// 중간에 추가된 필드
-          	
-          	public UserInfo(String name, String password, int age) {
-          		this.name = name;
-          		this.password = password;
-          		this.age = age;
-          	}
-          
-          	@Override
-          	public String toString() {
-          		return "UserInfo [name=" + name + ", age=" + age + "]";
-          	}
-          }
-          ```
+            ```java
+            class UserInfo implements Serializable {
+              String name;
+              transient String password;
+              int age;
+              String tel;// 중간에 추가된 필드
 
-        - 실행 결과 : `java.io.InvalidClassException` 발생
+              public UserInfo(String name, String password, int age) {
+                this.name = name;
+                this.password = password;
+                this.age = age;
+              }
 
-        - 해결  :  클래스에 `serialVersionUID` 명시 
+              @Override
+              public String toString() {
+                return "UserInfo [name=" + name + ", age=" + age + "]";
+              }
+            }
+            ```
 
-          ```java
-          class UserInfo implements Serializable {
-          	/**
-          	 * 
-          	 */
-          	private static final long serialVersionUID = 1L;//SUID 명시
-          	
-          	String name;
-          	transient String password;
-          	int age;
-          	String tel; 
-          	
-          	public UserInfo(String name, String password, int age) {
-          		this.name = name;
-          		this.password = password;
-          		this.age = age;
-          	}
-          
-          	@Override
-          	public String toString() {
-          		return "UserInfo [name=" + name + ", age=" + age + "]";
-          	}
-          }
-          ```
+          - 실행 결과 : `java.io.InvalidClassException` 발생
+
+          - 해결  :  클래스에 `serialVersionUID` 명시 
+
+            ```java
+            class UserInfo implements Serializable {
+              /**
+               * 
+               */
+              private static final long serialVersionUID = 1L;//SUID 명시
+
+              String name;
+              transient String password;
+              int age;
+              String tel; 
+
+              public UserInfo(String name, String password, int age) {
+                this.name = name;
+                this.password = password;
+                this.age = age;
+              }
+
+              @Override
+              public String toString() {
+                return "UserInfo [name=" + name + ", age=" + age + "]";
+              }
+            }
+            ```
 
           
