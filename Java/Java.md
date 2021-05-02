@@ -10,6 +10,7 @@
 - [예외처리](#예외처리)
 - [문자열 처리](#문자열-처리)
 - [직렬화](#직렬화)
+- [Comparable과 Comparator](#Comparable과-Comparator)
 
 <br>
 
@@ -831,18 +832,18 @@
                * 
                */
               private static final long serialVersionUID = 1L;//SUID 명시
-
+            
               String name;
               transient String password;
               int age;
               String tel; 
-
+            
               public UserInfo(String name, String password, int age) {
                 this.name = name;
                 this.password = password;
                 this.age = age;
               }
-
+            
               @Override
               public String toString() {
                 return "UserInfo [name=" + name + ", age=" + age + "]";
@@ -850,4 +851,62 @@
             }
             ```
 
-          
+<br>
+
+### Comparable과 Comparator
+
+- 객체의 정렬을 위해서 사용
+  - comparable : 기본 정렬기준을 구현 (클래스 내에서 구현) -> `Colletions.sort(list)`
+  - comparator : 기본 정렬기준 외에 다른 기준으로 정렬 -> `Collections.sort(list, ComparatorObj)`
+
+- 코드
+
+  ```java
+  // Comparator와 Comparable로 내림차순 정렬
+  public class CompareTest {
+  	public static void main(String[] args) {
+  		List<Pair> list = new ArrayList<>();
+  		list.add(new Pair(1, "강호동"));
+  		list.add(new Pair(2, "유재석"));
+  		list.add(new Pair(3, "박명수"));
+  		
+  		// id의 내림차순으로 정렬
+  		Collections.sort(list);
+  		System.out.println(list);
+  		
+  		// 이름의 내림차순으로 정렬
+  		Collections.sort(list, new Descending());
+  		System.out.println(list);
+  	}
+  	
+  	static class Pair implements Comparable<Pair>{
+  		int id;
+  		String name;
+  
+  		public Pair(int id, String name) {
+  			this.id = id;
+  			this.name = name;
+  		}
+  
+  		@Override
+  		public int compareTo(Pair p) {
+  			return (this.id - p.id) * -1;
+  		}
+  
+  		@Override
+  		public String toString() {
+  			return "[id=" + id + ", name=" + name + "]";
+  		}
+  	}
+  	
+  	static class Descending implements Comparator<Pair>{
+  		
+  		@Override
+  		public int compare(Pair p1, Pair p2) {
+  			return p1.name.compareTo(p2.name) * -1;
+  		}
+  	}
+  }
+  ```
+
+  
