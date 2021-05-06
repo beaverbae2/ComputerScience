@@ -909,4 +909,157 @@
   }
   ```
 
-  
+<br>
+
+### 익명 클래스 (Anonymous Class)
+
+- 이름이 없는 클래스
+
+  - 어떤 클래스를 상속하거나 인터페이스를 구현하여 **일회성으로 사용**
+
+  - getClass()로 어떤 클래스인지 확인할때 클래스명이 나오지 않음
+
+- 익명 클래스
+
+  - 코드
+
+    ```java
+    package anomymous;
+    
+    public class AnonymousClassTest {
+    	public static void main(String[] args) {
+    		Car car1 = new Car();
+    		Car car2 = new Benz();
+    		//익명 클래스 생성
+    		Car car3 = new Car() {
+    			public void showName() {
+    				System.out.println("Benz");
+    			};
+    		};
+    		
+    		//메소드 실행
+    		car1.showName();
+    		car2.showName();
+    		car3.showName();
+    		
+    		//클래스 확인
+    		System.out.println(car1.getClass());
+    		System.out.println(car2.getClass()); 
+    		System.out.println(car3.getClass()); 
+    	}
+    }
+    
+    
+    class Car {
+    	public void showName() {
+    		System.out.println("no name");
+    	}
+    }
+    
+    class Benz extends Car{
+    	public void showName() {
+    		System.out.println("Benz");
+    	}
+    }
+    
+    ```
+
+  - 실행 결과
+
+    ```
+    no name
+    Benz
+    Benz
+    class anomymous.Car
+    class anomymous.Benz
+    class anomymous.AnonymousClassTest$1
+    ```
+
+- 익명 인터페이스
+
+  - 코드
+
+    ```java
+    package anomymous;
+    
+    public class AnonymousInterfaceTest {
+    	public static void main(String[] args) {
+    		//익명 인터페이스 구현
+    		RemoteController remoteController = new RemoteController() {
+    			@Override
+    			public void turnOn() {
+    				System.out.println("turn on");
+    			}
+    			
+    			@Override
+    			public void turnOff() {
+    				System.out.println("turn off");
+    			}
+    		};
+    		
+    		//메소드 실행
+    		remoteController.turnOn();
+    		remoteController.turnOff();
+    		//클래스 확인
+    		System.out.println(remoteController.getClass());
+    		System.out.println();
+    		
+    		
+    		Animal lion1 = new Lion();
+    		//익명 인터페이스 구현
+    		Animal lion2 = new Animal() {
+    			@Override
+    			public void move() {
+    				System.out.println("Lion is moving");
+    			}
+    		};
+    		Animal lion3 = () -> {System.out.println("Lion is moving");};// 람다식이용
+    		
+    		//메소드 실행
+    		lion1.move();
+    		lion2.move();
+    		lion3.move();
+    		
+    		//클래스 확인
+    		System.out.println(lion1.getClass());
+    		System.out.println(lion2.getClass());
+    		System.out.println(lion3.getClass());
+    	}
+    }
+    
+    interface RemoteController {
+    	public void turnOn();
+    	public void turnOff();
+    }
+    
+    //함수형 인터페이스 : 한 개의 추상메소드만 있음 -> 람다식으로 구현 가능
+    interface Animal {
+    	public void move();
+    }
+    
+    class Lion implements Animal {
+    
+    	@Override
+    	public void move() {
+    		System.out.println("Lion is moving");
+    	}
+    }
+    ```
+
+  - 실행결과
+
+    ```
+    turn on
+    turn off
+    class anomymous.AnonymousInterfaceTest$1
+    
+    Lion is moving
+    Lion is moving
+    Lion is moving
+    class anomymous.Lion
+    class anomymous.AnonymousInterfaceTest$2
+    class anomymous.AnonymousInterfaceTest$$Lambda$1/0x0000000800061040
+    ```
+
+    
+
