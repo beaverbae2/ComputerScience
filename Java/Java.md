@@ -11,6 +11,8 @@
 - [문자열 처리](#문자열-처리)
 - [직렬화](#직렬화)
 - [Comparable과 Comparator](#Comparable과-Comparator)
+- [익명 클래스](#익명-클래스)
+- [람다식](#람다식)
 
 <br>
 
@@ -911,9 +913,9 @@
 
 <br>
 
-### 익명 클래스 (Anonymous Class)
+### 익명 클래스
 
-- 이름이 없는 클래스
+- 이름이 없는 클래스(Anonymous Class)
 
   - 어떤 클래스를 상속하거나 인터페이스를 구현하여 **일회성으로 사용**
 
@@ -924,8 +926,6 @@
   - 코드
 
     ```java
-    package anomymous;
-    
     public class AnonymousClassTest {
     	public static void main(String[] args) {
     		Car car1 = new Car();
@@ -980,8 +980,6 @@
   - 코드
 
     ```java
-    package anomymous;
-    
     public class AnonymousInterfaceTest {
     	public static void main(String[] args) {
     		//익명 인터페이스 구현
@@ -1061,5 +1059,162 @@
     class anomymous.AnonymousInterfaceTest$$Lambda$1/0x0000000800061040
     ```
 
+  <br>
+
+### 람다식
+
+- == 익명 객체
+
+- 람다식으로 전환 하기
+
+  - 메소드
+
+    ```java
+    int max(int a, int b) {
+    	return a > b ? a : b;
+    }
+    ```
+
+  - 람다식 : 3가지 모두 동일, 원래 메소드의 리턴타입과 메소드명 삭제
+
+    ```java
+    (int a, int b) -> {return a > b ? a : b; }
+    (int a, int b) -> a > b ? a : b;
+    (a, b) -> a > b ? a : b;
+    ```
+
+- 함수형 인터페이스
+
+  - 한 개의 추상메소드를 가진 인터페이스를 통해 람다식 구현
+
+  - 함수형 인터페이스 코드
+
+    - 함수형 인터페이스
+
+      ```java
+      @FunctionalInterface //함수형 인터페이스 : 구현해야할 추상 메소드가 한 개임을 명시
+      public interface LambdaInterface {
+      	int max (int a, int b);
+      //	int max2 (int a, int b); 사용 불가 : 추상메소드가 하나만 존재해야한다 
+      	
+      	default int max2 (int a, int b) {// default method는 별개
+      		return a > b ? a : b;
+      	}
+      	static int max3 (int a, int b) {// static method는 별개
+      		return a > b ? a : b;
+      	}
+      }
+      ```
+
+    - 함수형 인터페이스 테스트
+
+      ```java
+      package lambda;
+      
+      import java.util.ArrayList;
+      import java.util.Collections;
+      import java.util.Comparator;
+      import java.util.List;
+      
+      public class LambdaInterfaceTest {
+      	public static void main(String[] args) {
+      		// 함수형 인터페이스 구현
+      		//1. 익명 클래스로 구현
+      		LambdaInterface lambdaInterface1 = new LambdaInterface() {
+      			@Override
+      			public int max(int a, int b) {
+      				return a > b ? a : b;
+      			}
+      		};
+      		
+      		//2. 람다식 이용 -> 익명클래스의 객체와 동일
+      		LambdaInterface lambdaInterface2 = (int a, int b) -> { return a > b ? a : b; };
+      		
+      		//3. 람다식 이용 -> 타입 생략 가능
+      		LambdaInterface lambdaInterface3 = (a, b) -> a > b ? a : b; 
+      		
+      		System.out.println(lambdaInterface1.getClass());
+      		System.out.println(lambdaInterface2.getClass());
+      		System.out.println(lambdaInterface3.getClass());
+      		
+      		//List 정렬 -> Comparator 사용
+      		List<Integer> list = new ArrayList<>();
+      		for (int i = 1; i <= 5; i++) {
+      			list.add(i);
+      		}
+      		
+      		//내림차순정렬
+      		Collections.sort(list, new Comparator<Integer>() {
+      			@Override
+      			public int compare(Integer o1, Integer o2) {
+      				return o2 - o1;
+      			}
+      		});
+      		//람다식으로 표현
+      		Collections.sort(list, (o1, o2) -> o2-o1);
+      		
+      		System.out.println(list);
+      		
+      		//사용자 정의 객체(필드가 2개 이상) 정렬 -> Comparator사용
+      		List<Pair> list2 = new ArrayList<>();
+      		list2.add(new Pair(1, "강호동"));
+      		list2.add(new Pair(2, "유재석"));
+      		list2.add(new Pair(3, "유재석"));
+      		list2.add(new Pair(4, "강호동"));
+      		
+      		// 이름 오름차순, 이름이 같다면 id 순
+      		Collections.sort(list2, new Comparator<Pair>() {
+      			@Override
+      			public int compare(Pair o1, Pair o2) {
+      				if (!o1.name.equals(o2.name)) {
+      					return o1.name.compareTo(o2.name);
+      				} else {
+      					return o1.id - o2.id;
+      				}
+      			}
+      		});
+      		
+      		//람다식으로 표현
+      		Collections.sort(list2, (o1, o2) -> {
+      			if(!o1.name.equals(o2.name)) {
+      				return o1.name.compareTo(o2.name);
+      			} else {
+      				return o1.id - o2.id;
+      			}
+      		});
+      		
+      		System.out.println(list2);
+      	}
+      	
+      	static class Pair {
+      		int id;
+      		String name;
+      
+      		public Pair(int id, String name) {
+      			this.id = id;
+      			this.name = name;
+      		}
+      
+      
+      		@Override
+      		public String toString() {
+      			return "[id=" + id + ", name=" + name + "]";
+      		}
+      	}
+      	
+      }
+      ```
+
+    - 실행 결과
+
+      ```
+      class lambda.LambdaInterfaceTest$1
+      class lambda.LambdaInterfaceTest$$Lambda$1/0x0000000800060840
+      class lambda.LambdaInterfaceTest$$Lambda$2/0x0000000800061040
+      [5, 4, 3, 2, 1]
+      [[id=1, name=강호동], [id=4, name=강호동], [id=2, name=유재석], [id=3, name=유재석]]
+      ```
+
     
 
+    
