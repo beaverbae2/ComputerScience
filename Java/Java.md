@@ -1063,6 +1063,8 @@
 
 ### 람다식
 
+참고 자료 : 자바의 정석 p.794~811
+
 - == 익명 객체
 
 - 람다식으로 전환 하기
@@ -1205,7 +1207,7 @@
       }
       ```
 
-    - 실행 결과
+      실행 결과
 
       ```
       class lambda.LambdaInterfaceTest$1
@@ -1215,6 +1217,217 @@
       [[id=1, name=강호동], [id=4, name=강호동], [id=2, name=유재석], [id=3, name=유재석]]
       ```
 
-    
 
+- java.util.function패키지
+
+  - 일반적으로는 함수형 인터페이스를 직접 만들기보단 function패키지에서 제공하는 인터페이스를 사용한다
+  - 기본 인터페이스(매개 변수가 없거나 하나)
+    - `java.lang.runnable`
+      - 메소드 : `void run()`
+      - 특징 : 매개변수X, 리턴X
+    - `Supplier<T>`
+      - 메소드: `T get()`
+      - 특징 : 매개변수X, 리턴O
+    - `Consumer<T>`
+      - 메소드 : `void apccept(T t)`
+      - 특징 : 매개변수O, 리턴X
+    - `Function<T,R>`
+      - 메소드 : `R apply(T t)`
+      - 특징 : 매개변수O, 리턴O
+      - 변형
+        - `UnaryOperator<T,T>`
+    - `Predicate<T>`
+      - 메소드 : `boolean test(T t)`
+      - 특징 : 매개변수O, 리턴O (boolean)
+  - 매개변수가 2개
+    - `BiConsumer<T,U>`
+    - `BiFunction<T,U,R>` -> 변형 : `BinaryOperator<T,T>`
+    - `BiPredicate<T,U>`
+
+  - 3개 이상? -> 함수형 인터페이스로 직접 정의
+
+  - 테스트1 - 컬렉션 프레임워크에 있는 함수형 인터페이스 적용
+
+    ```java
+    import java.util.*;
     
+    public class FunctionTest1 {
+    	public static void main(String[] args) {
+    		List<Integer> list = new ArrayList<>();
+    		for (int i = 0; i < 10; i++) {
+    			list.add(i);
+    		}
+    		
+    		list.forEach((i) -> {System.out.print(i+" "); });// Consumer
+    		System.out.println();
+    		
+    		list.removeIf((x) -> x % 2 == 0 || x % 3 ==0);// Predicate
+    		System.out.println(list);
+    		
+    		list.replaceAll((i) -> i*10); //UnaryOperator
+    		System.out.println(list);
+    		
+    		Map<String, String> map = new HashMap<>();
+    		map.put("1", "1");
+    		map.put("2", "2");
+    		map.put("3", "3");
+    		map.put("4", "4");
+    		
+    		map.forEach((k, v) -> {System.out.print("("+k+", "+v+"), "); });// BiConsumer
+    	}
+    }
+    ```
+
+    실행결과
+
+    ```
+    0 1 2 3 4 5 6 7 8 9 
+    [1, 5, 7]
+    [10, 50, 70]
+    (1, 1), (2, 2), (3, 3), (4, 4), 
+    ```
+
+  - 테스트2 - function패키지의 함수형 인터페이스 활용
+
+    ```java
+    import java.util.*;
+    import java.util.function.*;
+    
+    public class FunctionTest2 {
+    	public static void main(String[] args) {
+    		Supplier<Integer> s = () -> (int) (Math.random()*100)+1;
+    		Consumer<Integer> c = i -> {System.out.print(i+", "); };
+    		Predicate<Integer> p = i -> i%2==0;
+    		Function<Integer, Integer> f = i -> i/10*10;// 일의 자리를 없애기
+    		
+    		List<Integer> list = new ArrayList<>();
+    		makeRandomList(s, list);
+    		System.out.println(list);
+    		printEvenNum(p, c, list);
+    		System.out.println(doSomething(f, list));
+    	}
+    	
+    	
+    	private static <T> List<T> doSomething(Function<T, T> f, List<T> list) {
+    		List<T> newList = new ArrayList<>(list.size());
+    		
+    		for (T t : list) {
+    			newList.add(f.apply(t));
+    		}
+    		return newList;
+    	}
+    
+    
+    	private static <T> void printEvenNum(Predicate<T> p, Consumer<T> c, List<T> list) {
+    		System.out.print("[");
+    		for (T t : list) {
+    			if (p.test(t)) {
+    				c.accept(t);
+    			}
+    		}
+    		System.out.println("]");
+    	}
+    
+    
+    	static <T> void makeRandomList(Supplier<T> s, List<T> list) {
+    		for (int i = 0; i < 10; i++) {
+    			list.add(s.get());
+    		}
+    	}
+    }
+    ```
+
+    실행결과
+
+    ```
+    [43, 5, 35, 40, 86, 60, 21, 45, 6, 20]
+    [40, 86, 60, 6, 20, ]
+    [40, 0, 30, 40, 80, 60, 20, 40, 0, 20]
+    ```
+
+- Function과 Predicate의 결합
+
+  - Function : 수학에서의 함수처럼 결합(합성)이 가능
+
+    - g(f(x)) 를 표현하려면 
+    - `f.andThen(Function g)`
+    - `g.compose(Function f)`
+
+  - Predicate : boolean연산(!(not), and, or) 가능
+
+    - !(not) : `negate()`
+    - or : `or(Predicate p)`
+    - and : `and(Predicate p)`
+
+  - 테스트
+
+    ```java
+    import java.util.function.Function;
+    import java.util.function.Predicate;
+    
+    public class FunctionTest3 {
+    	public static void main(String[] args) {
+    		Function<String, Integer> f = (s) -> Integer.parseInt(s, 16);
+    		Function<Integer, String> g = (i) -> Integer.toBinaryString(i);
+    		Function<String, String> h1 = f.andThen(g);
+    		System.out.println(h1.apply("FF"));
+    		
+    		Function<String, String> h2 = g.compose(f);
+    		System.out.println(h2.apply("FF"));
+    		
+    		Predicate<Integer> p = i -> i < 100;
+    		Predicate<Integer> q = i -> i < 200;
+    		Predicate<Integer> r = i -> i%2 == 0;
+    		Predicate<Integer> notP = p.negate(); //i >= 100
+    		
+    		Predicate<Integer> all = notP.and(q.or(r));
+    		System.out.println(all.test(150));
+    		System.out.println(all.test(311));
+    	}
+    }
+    ```
+
+    실행결과
+
+    ```
+    11111111
+    11111111
+    true
+    false
+    ```
+
+- 메소드 참조
+
+  - 하나의 메소드만 호출하는 람다식 -> `클래스명(타입)::메소드명` or `참조변수::메소드명`
+  - 간결하지만 어떤 매개변수가 필요한지 바로 보이지 않는다
+
+  - 테스트
+
+    ```java
+    import java.util.function.*;
+    
+    public class FunctionTest4 {
+    	public static void main(String[] args) {
+    		Function<String, Integer> f1 = s -> Integer.parseInt(s);
+    		Function<String, Integer> f2 = Integer::parseInt;
+    		System.out.println(f1.apply("23"));
+    		System.out.println(f2.apply("23"));
+    		
+    		BiPredicate<String, String> p1 = (s1, s2) -> s1.equals(s2);
+    		BiPredicate<String, String> p2 = String::equals;
+    		System.out.println(p1.test("A", "A"));
+    		System.out.println(p2.test("A", "A"));
+    	}
+    }
+    ```
+
+    실행 결과
+
+    ```
+    23
+    23
+    true
+    true
+    ```
+
+<br>
