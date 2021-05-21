@@ -526,23 +526,25 @@
 
 - 참고 자료
   
-- [기적을 만드는 기록 - 예외 & 예외 처리란?](https://jiwontip.tistory.com/5)
+  - 자바의 정석
+  - [기적을 만드는 기록 - 예외 & 예외 처리란?](https://jiwontip.tistory.com/5)
   
 - 에러와 예외
   - 에러 : 수습 불가능한 오류
   - 예외 : 수습가능한 다소 미약한 오류
+  
 - 예외 클래스의 계층 구조
   -  Throwable
-    - Exception
-      - (Checked Exception) - compile 시 확인
-        - IOException
-        - ....
-        - ClassNotFoundException
-      - (Unchecked Exception) RuntimeException - runtime 확인
-        - ArithmeticException
-        - NullPointerException
-        - ...
-        - IndexOutOfBoundException
+    -  Exception
+      -  (Checked Exception) - compile 시 확인 (외적 요인에 의해 발생)
+        -  IOException
+        -  ....
+        -  ClassNotFoundException
+      -  (Unchecked Exception) RuntimeException - runtime 시 확인 (프로그래머 실수로 발생)
+        -  ArithmeticException
+        -  NullPointerException
+        -  ...
+        -  IndexOutOfBoundException
 
 - 예외 처리 방법
 
@@ -563,31 +565,25 @@
   - throw, throws
 
     - throw : 강제로 예외 발생 시키기
-    - throws : 메소드를 호출한 상위 메소드에서 예외를 처리
 
-    - 사용자 정의 예외 클래스 : Exception이나 RuntimeException 클래스를 상속받아 구현 
+    - throws 
+
+      - 메소드를 호출한 상위 메소드에 예외를 전달
+      - 반드시 상위 메소드 중 하나에서 처리 되어야함
+        - try-catch 사용해서 처리
+        - main (최상위 메소드) 까지 예외가 전달 되었다면
+          - try-catch
+          - throws
+
+    - 사용자 정의 예외 클래스 
+
+      - Exception이나 RuntimeException 클래스를 상속받아 구현 
+      - Exception을 상속하는 경우 예외를 올바로 처리하지 않으면 컴파일 에러 발생
+      - RuntimeException을 상속하는 경우 컴파일 에러 발생X
 
     - 구현 예시
 
       ```java
-      // 사용자 정의 스택 구현
-      public class Test {
-      	public static void main(String[] args) {
-      		MyStack stack = new MyStack(3);
-      		stack.push(1);
-      		stack.push(2);
-      		System.out.println(stack.pop());
-      		stack.push(3);
-      		stack.push(4);
-      		stack.push(5);
-      		System.out.println(stack.pop());
-      		System.out.println(stack.pop());
-      		System.out.println(stack.pop());
-      		System.out.println(stack.pop());
-      		System.out.println(stack.pop());
-      	}
-      }
-      
       // 배열로 stack구현
       class MyStack {
       	int[] arr;
@@ -631,39 +627,107 @@
       	}
       }
       
-      // 사용자 정의 예외 클래스 구현
-      class EmptyException extends RuntimeException{
-      	/**
-      	 * add this because Serializable
-      	 */
-      	private static final long serialVersionUID = 1L;
-      
-      	public EmptyException() {
-      		super();
-      	}
-      	
-      	public EmptyException(String msg) {
-      		super(msg);
-      	}
-      }
-      
-      // 사용자 정의 예외 클래스 구현
-      class FullException extends RuntimeException{
-      	/**
-      	 * add this because Serializable
-      	 */
-      	private static final long serialVersionUID = 1L;
-      
-      	public FullException() {
-      		super();
-      	}
-      	
-      	public FullException(String msg) {
-      		super(msg);
-      	}
-      }
-      
       ```
+
+      - 사용자 정의 예외 - Exception 상속
+
+        ```java
+        //사용자 정의 예외 클래스 구현
+        class EmptyException extends Exception{
+        	/**
+        	 * add this because Serializable
+        	 */
+        	private static final long serialVersionUID = 1L;
+        
+        	public EmptyException() {
+        		super();
+        	}
+        	
+        	public EmptyException(String msg) {
+        		super(msg);
+        	}
+        }
+        
+        //사용자 정의 예외 클래스 구현
+        class FullException extends Exception{
+        	/**
+        	 * add this because Serializable
+        	 */
+        	private static final long serialVersionUID = 1L;
+        
+        	public FullException() {
+        		super();
+        	}
+        	
+        	public FullException(String msg) {
+        		super(msg);
+        	}	
+        }
+        ```
+        - 예외 처리 - main
+
+          - 방법 1
+
+            ```java
+            public class ExceptionTest {
+            	public static void main(String[] args) {
+            		MyStack stack = new MyStack(3);
+            		try {
+            			stack.push(1);
+            			stack.push(2);
+            			System.out.println(stack.pop());
+            			stack.push(3);
+            			stack.push(4);
+            			stack.push(5);
+            			System.out.println(stack.pop());
+            			System.out.println(stack.pop());
+            			System.out.println(stack.pop());
+            			System.out.println(stack.pop());
+            			System.out.println(stack.pop());
+            		} catch (FullException | EmptyException e) {
+            			e.printStackTrace();
+            		}
+            	}
+            }
+            ```
+
+          - 방법 2
+
+            ```java
+            public class ExceptionTest {
+            	public static void main(String[] args) throws FullException, EmptyException {
+            		MyStack stack = new MyStack(3);
+            		//....
+                }
+            }
+            ```
+
+            
+
+      - 사용자 정의 예외 - RuntimeException 상속
+
+        ```java
+        //사용자 정의 예외 클래스 구현
+        class EmptyException extends RuntimeException{
+        	//...
+        }
+        
+        //사용자 정의 예외 클래스 구현
+        class FullException extends RuntimeException{
+        	//...
+        }
+        ```
+
+        - 예외 처리 - main
+
+          ```java
+          public class ExceptionTest {
+          	public static void main(String[] args) {
+          		MyStack stack = new MyStack(3);
+          		//....
+              }
+          }
+          ```
 
 <br>
 
