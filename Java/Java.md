@@ -535,16 +535,16 @@
   
 - 예외 클래스의 계층 구조
   -  Throwable
-    -  Exception
-      -  (Checked Exception) - compile 시 확인 (외적 요인에 의해 발생)
-        -  IOException
-        -  ....
-        -  ClassNotFoundException
-      -  (Unchecked Exception) RuntimeException - runtime 시 확인 (프로그래머 실수로 발생)
-        -  ArithmeticException
-        -  NullPointerException
-        -  ...
-        -  IndexOutOfBoundException
+     -  Exception
+         -  (Checked Exception) - compile 시 확인 (외적 요인에 의해 발생)
+             -  IOException
+             -  ....
+             -  ClassNotFoundException
+         -  (Unchecked Exception) RuntimeException - runtime 시 확인 (프로그래머 실수로 발생)
+             -  ArithmeticException
+             -  NullPointerException
+             -  ...
+             -  IndexOutOfBoundException
 
 - 예외 처리 방법
 
