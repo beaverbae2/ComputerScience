@@ -330,6 +330,7 @@
 - 불변 객체란
 
   - 한 번 생성 후, 외부에서 변경 불가능한 객체
+  - 필드는 한 번 할당 후 변경 불가능하다
 
 - 장단점
 
@@ -342,18 +343,29 @@
 
 - 구현
 
-  - 필드가 primitive type만 있는 경우 : setter사용X (필수), final 키워드 사용(선택)
+  - 공통 사항
+
+    - 모든 필드는 private 제어자 사용
+      - 외부에서 필드 수정 직접 하는 것 불가
+    - setter 사용X
+      - 필드 값 수정 불가 
+    - final 사용 권장
+      - final : 한 번만 할당 가능
+      - final 키워드가 붙은 변수는 setter 생성 불가
+
+  - 필드가 primitive type만 있는 경우 : setter사용X, final 사용
 
     ```java
+    // 1. 필드가 기본형 타입만 있는 경우
     class PrimitiveObject {
-    	final int value;
+    	private final int v;
     
-    	public PrimitiveObject(int value) {
-    		this.value = value;
+    	public PrimitiveObject(int v) {
+    		this.v = v;
     	}
     
-    	public int getValue() {
-    		return value;
+    	public int getV() {
+    		return v;
     	}
     }
     ```
@@ -363,15 +375,15 @@
     - 단일 객체만 있는 경우 : 해당 객체도 불변 객체로 생성
 
       ```java
-      // 1. 필드에 단일 객체가 있는 경우
-      class ReferenceObject1 {
+      // 2. 필드에 참조형 타입(단일 객체)이 있는 경우
+      class ReferenceObject {
       	private final Pair p;
       
-      	public ReferenceObject1(Pair p) {
+      	public ReferenceObject(final Pair p) {
       		this.p = p;
       	}
       
-      	public Pair getP() {
+      	public Pair getPair() {
       		return p;
       	}
       }
@@ -402,52 +414,93 @@
 
     - 배열이 있는 경우 
 
-      - 생성 : 인자로 들어오는 배열의 요소를 가지는 **새로운 배열 객체 생성**
-      - getter : 외부에서 수정 불가능하게 **원본과 다른 복사본을 생성**해서 리턴
+      - 같은 인스턴스를 가리키는 것을 막아야한다
+        - 외부에서 인덱스 값을 새로 **재할당** 할 수 있기 때문이다 -> 변경 가능
+      - 구현 - 깊은 복사 
+        - 생성시 : 인자로 들어오는 배열의 요소를 가지는 **새로운 배열 객체 생성**
+        - getter : 외부에서 수정 불가능하게 **원본과 다른 복사본을 생성**해서 리턴
 
       ```java
-      //2. 필드에 배열이 있는 경우
-      class ReferenceObject2 {
-      	private final Pair[] arr;
-      	
-      	public ReferenceObject2(Pair[] arr) {
-      //		this.arr = arr; // 필드arr이 인자arr 주소를 참조 -> 인자arr의 값이 변경되면 필드arr의 값도 변경(not immutable) 
-      		this.arr = Arrays.copyOf(arr, arr.length); // 인자 arr의 요소를 갖는0 새로운 객체 생성 -> 필드arr와 인자arr의 주소가 다름 
+      // 3. 필드에 배열이 있는 경우
+      class ArrayObject {
+      	private final Pair[] array;
+      
+      	public ArrayObject(Pair[] array) {
+      //		this.array = array; // 문제 발생 : 파라미터로 받은 array와 필드 array가 같은 인스턴스를 가리킨다(주소가 같다)
+      		this.array = Arrays.copyOf(array, array.length); // 해결 : 복사본 생성 (깊은 복사, 서로 다른 주소 참조)
       	}
       
-      	public Pair[] getArr() {
-      //		return arr;// 외부에서 변경 가능 
-      		return (arr == null) ? null : arr.clone();// 복사본 리턴 : 외부에서 변경해도 영향 없음
+      	public Pair[] getArray() {
+      //		return array; // 문제 발생 : 외부에서 할당한 참조 변수와 필드 array가 같은 인스턴스를 가리킨다(주소가 같다) 
+      		return (array == null) ? null : array.clone(); // 해결 : 복사본 생성 (깊은 복사, 서로 다른 주소 참조)
       	}
       }
       ```
 
     - List가 있는 경우
 
-      - 생성 : 인자로 들어오는 List의 요소를 가지는 **새로운 List 객체 생성**
-      - getter : 외부에서 수정 불가능하게 `Collections.unmodifiableList(List list);` 사용
-
+      - 배열과 같은 방식으로 구현한다
+      - 구현 - 깊은 복사
+        - 생성 : 인자로 들어오는 List의 요소를 가지는 **새로운 List 객체 생성**
+        - getter : 외부에서 수정 불가능하게 `Collections.unmodifiableList(List list);` 사용
+      
       ```java
-      //3. 필드에 리스트가 있는 경우
-      class ReferenceObject3 {
+      // 4. 필드에 리스트가 있는 경우
+      class ListObject {
       	private final List<Pair> list;
       
-      	public ReferenceObject3(List<Pair> list) {
-      //		this.list = list; // 필드list가 인자list 주소를 참조 -> 인자list의 값이 변경되면 필드list의 값도 변경(not immutable) 
-      		this.list = new ArrayList<>(list);// 인자 list의 요소로 갖는 새로운 객체 생성 -> 필드list와 인자list의 주소가 다름 
+      	public ListObject(List<Pair> list) {
+      //		this.list = list; // 문제 : 필드에 리스트가 있는 경우와 동일
+      		this.list = new ArrayList<>(list); // 해결
       	}
       
       	public List<Pair> getList() {
-      //		return list; // 외부에서 변경 가능
-      		return Collections.unmodifiableList(list);// 외부에서 변경 시도시 UnsupportedOperationException 발생
+      //		return list; // 문제 발생
+      		return Collections.unmodifiableList(list);// 해결
       	}
-      }
+      } 
       ```
 
-- 참고
-  
-- final을 사용해도 일반적인 getter를 사용하면 배열이나 list 리턴 받고 수정 가능하다 -> 주소가 동일하기 때문
-  
+  - 테스트
+
+    ```java
+    public class ImmutableObjectTest {
+    	public static void main(String[] args) {
+    		PrimitiveObject primitiveObject = new PrimitiveObject(10);
+    		System.out.println(primitiveObject.getV());
+    		
+    		ReferenceObject referenceObject = new ReferenceObject(new Pair(4, 5));
+    		referenceObject.getPair();
+    		
+    		Pair[] pairArray = new Pair[3];
+    		pairArray[0] = new Pair(1, 2);
+    		pairArray[1] = new Pair(2, 3);
+    		pairArray[2] = new Pair(3, 4);
+    		
+    		ArrayObject arrayObject = new ArrayObject(pairArray);
+    		Pair[] getArray = arrayObject.getArray();
+    		getArray[0] = new Pair(4, 5);
+    		
+    		System.out.println(Arrays.toString(getArray));// 수정X
+    		System.out.println(Arrays.toString(pairArray));// 수정O
+    		System.out.println(Arrays.toString(arrayObject.getArray()));// 수정X
+    		
+    		List<Pair> pairList = new ArrayList<Pair>();
+    		pairList.add(new Pair(1, 2));
+    		pairList.add(new Pair(2, 3));
+    		pairList.add(new Pair(3, 4));
+    		
+    		ListObject listObject = new ListObject(pairList);
+    		List<Pair> getList = listObject.getList();
+    		getList.add(new Pair(4, 5)); // 에러 발생
+    		
+    		System.out.println(getList);
+    		System.out.println(pairList);
+    		System.out.println(listObject.getList());
+    	}
+    }
+    ```
+
 - 요약
 
   - 기본: setter X, final 사용
@@ -457,11 +510,15 @@
   - referrence type
     - 단일 객체 : 참조하는 객체도 기본대로 불변객체로 생성
     - 배열, 리스트
-      - 주소를 다르게 한다
-      - 생성시 인자로 들어오는 요소들을 똑같이 가지는 새로운 객체 생성
-      - getter 사용시 외부에서 변경 불가능하게 처리
-        - 배열 : 복사본을 따로 만들어서 보냄 (수정해도 원본에 영향X)
-        - List : `Collections.unmodifiableList(List list);` 로 변경 원천 차단
+      - 새로운 문제 발생
+        - 원인 : 같은 인스턴스 주소를 가리켜서 재할당시 변경 발생
+      - 해결
+        - 주소를 다르게 한다 -> 깊은 복사
+          - 생성
+            - 배열, 리스트 모두 깊은 복사한 새로운 인스턴스 생성
+          - getter 
+            - 배열 : 깊은 복사한 새로운 인스턴스 반환
+            - 리스트 : `Collections.unmodifiableList()` 사용하여 변경 시 예외 발생시킴
 
 <br>
 
