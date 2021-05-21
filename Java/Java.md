@@ -978,10 +978,18 @@
 
 ### Comparable과 Comparator
 
-- 객체의 정렬을 위해서 사용
-  - comparable : 기본 정렬기준을 구현 (클래스 내에서 구현) -> `Colletions.sort(list)`
-  - comparator : 기본 정렬기준 외에 다른 기준으로 정렬 -> `Collections.sort(list, ComparatorObj)`
+- 둘 다 인터페이스 이다 (함수형 인터페이스)
+  - 자식클래스에서 상속해서 구현
+  - wrapper클래스, String클래스 등에서 이를 상속하고 있음
 
+- 객체의 정렬을 위해서 사용 -> 비교를 통해 정렬
+  - Comparable 
+    - 기본 정렬 기준을 구현 (클래스 내에서 구현) -> `Colletions.sort(list)`
+    - 메소드 : compareTo()
+  - Comparator 
+    - 기본 정렬 기준 외에 다른 기준으로 정렬 -> `Collections.sort(list, ComparatorObj)`
+    - 메소드 : compare()
+  
 - 코드
 
   ```java
