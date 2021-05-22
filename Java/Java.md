@@ -804,23 +804,31 @@
 - 참고 자료
   - [Nesoy Blog - Java의 직렬화란?](https://nesoy.github.io/articles/2018-04/Java-Serialize)
   - [Stop the world - Java 객체 직렬화와 역직렬화](https://flowarc.tistory.com/entry/Java-%EA%B0%9D%EC%B2%B4-%EC%A7%81%EB%A0%AC%ED%99%94Serialization-%EC%99%80-%EC%97%AD%EC%A7%81%EB%A0%AC%ED%99%94Deserialization)
-  - Java의 정석 직렬화Part (p.934~p.944)
+  - Java의 정석 - 직렬화Part (p.934~p.944)
+  
+  
+  
 - 직렬화, 역직렬화
-  - 직렬화 : 객체나 데이터를 byte형태로 변환
-  - 역직렬화 : byte형태의 데이터를 객체나 데이터로 변환
-  - 객체를 저장했다가 다시 꺼내쓸 때, 또는 서로 간의 객체를 주고 받기 위해 직렬화 사용
+
+  - 직렬화 
+    - 객체를 데이터 스트림(바이트 코드)으로 변환
+    - **인스턴스 변수만 직렬화의 대상**
+  - 역직렬화 
+    - 데이터 스트림을 객체로 변환
+  - 직렬화의 목적
+    - 객체를 저장했다가 다시 꺼내쓸 때, 또는 서로 간의 객체를 주고 받기 위해 직렬화 사용
 
 - 구현
 
   - 직렬화
 
-    - 조건 - `java.io.Serializable` 상속
+    - 조건 - `java.io.Serializable` 구현 (참고 : 부모 객체가 직렬화 가능하면 자식 객체도 가능)
 
       ```java
       class UserInfo implements Serializable {
-      	String name;
-      	transient String password;
-      	int age;
+      	private String name;
+      	private transient String password;// transient : 직렬화 대상에서 제외
+      	private int age;
       	
       	public UserInfo(String name, String password, int age) {
       		this.name = name;
@@ -878,18 +886,17 @@
       - 조건
 
         - 직렬화와 역직렬화를 진행하는 시스템이 서로 다를 수 있음을 인지
-
         - 동일한 `serialVersionUID`를 가지고 있어야 함
-
+        
           - `serialVersionUID`는 클래스가 변경(메소드 or 필드 변경) 될 때마다 변경
           - 그렇기에 일반적으로 클래스의 필드에 `serialVersionUID` 명시 동일한 값을 갖게 함
           - `serialVersionUID`가 다를 경우 `java.io.InvalidClassException` 발생
           - `serialVersionUID` 가 같아도 변수의 type이 달리진 경우 역직렬화 불가
-
-        - 직렬화할 때와 역직렬화 할 때의 순서는 동일해야 함
-
+        - **직렬화할 때와 역직렬화 할 때의 순서는 동일해야 함**
+          - List에 데이터를 저장하는것이 편하다
+        
       - 방법 - `java.io.ObjectInputStream` 사용
-
+      
         ```java
         import java.io.BufferedInputStream;
         import java.io.FileInputStream;
@@ -920,41 +927,41 @@
         	}
         }
         ```
-
+      
       -  `serialVersionUID` 적용
-
+      
           - **상황 - class의 구성 요소 변경**
-
+      
             ```java
             class UserInfo implements Serializable {
               String name;
               transient String password;
               int age;
               String tel;// 중간에 추가된 필드
-
+      
               public UserInfo(String name, String password, int age) {
                 this.name = name;
                 this.password = password;
                 this.age = age;
               }
-
+      
               @Override
               public String toString() {
                 return "UserInfo [name=" + name + ", age=" + age + "]";
               }
             }
             ```
-
+      
           - 실행 결과 : `java.io.InvalidClassException` 발생
-
+      
           - 해결  :  클래스에 `serialVersionUID` 명시 
-
+      
             ```java
             class UserInfo implements Serializable {
               /**
                * 
                */
-              private static final long serialVersionUID = 1L;//SUID 명시
+              private static final long serialVersionUID = -1224074296460704595L;;//SUID 명시
             
               String name;
               transient String password;
