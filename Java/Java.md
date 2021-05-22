@@ -20,56 +20,273 @@
 
 **참고 자료**
 
-- [JVM](https://asfirstalways.tistory.com/158)
+- [Jbee - JVM](https://asfirstalways.tistory.com/158)
+- [Naver D2 - JVM](https://d2.naver.com/helloworld/1230)
 
-#### 자바 파일의 실행 과정
+#### JVM
+
+- Java Virtual Machine
+- 자바 프로그램과 OS사이에서 중개자 역할
+  - OS에 구애받지 않고 실행 가능
+- 자바 프로그램을 실행해주는 역할
+  - 메모리 관리 
+  - GC
+
+#### 자바 프로그램의 실행 과정
 
 - 프로그램 실행
-- JVM이 운영체제로 부터 메모리 할당
+- JVM이 OS로 부터 메모리 할당
 - javac(자바 컴파일러)가 .java -> .class(byte code)로 변환
-- Class Loader가 .class 파일 받아서 Runtime Data Area로 전달
-- byte code는 Runtime Data Area에 배치되어 실행, 필요에 따라 JVM이 쓰레드 동기화와 GC작업 수행
-- Execution Engine을 통해 (기계어로 번역되어) 실행
+- Class Loader를 통해 JVM에 class파일 로딩
+- Class Loader가 byte code를 Runtime Data Area에 배치
+- 배치된 byte code는 Runtime Data Area에 배치되어 실질적으로 수행
+  - 이떄 필요에 따라 JVM은 쓰레드 동기화나 GC 진행
 
 #### JVM(Java Virtual Machine)의 구조
 
 - Class Loader
-  - .class(byte code) 파일을 **동적로딩**하여 Runtime Data Area(Method Area)로 보냄
-  - 동적 로딩 : 모든 클래스를 다 로딩하는게 아니고 필요한 클래스만 로딩
-- Runtime Data Area
+  - .class(byte code) 파일을 **동적로딩**하여 Runtime Data Area로 보냄
+  - 동적 로딩 
+    - 모든 클래스를 다 로딩하는게 아니고 **런타임시에 그때 그때 필요한 클래스만 로딩**
+    - 로딩 : 메모리(Runtime Data Area)에 적재
+  - 동적 링킹
+    - 링킹(Linking) : 프로그램 실행에 필요한 라이브러리나 다른 프로그램을 합침 (import)
+      - 정적 링킹 : **컴파일 시에** 프로그램 실행에 필요한 모든 라이브러리 모듈 복사 
+      - 동적 링킹 : 모든 라이브러리 모듈 복사X, 주소만 가지고 있다가 **런타임 시에 필요한 라이브러리 모듈 복사**
+    - 검증(verifying) : 클래스가 자바 언어 명세대로 잘 구성되어 있는지 검사
+    - 준비(preparing) : 클래스가 필요로 하는 메모리 할당, 클래스에 정의된 필드, 메소드, 인터페이스 저장
+    - 분석(Resolving) : 클래스 상수 풀 내의 모든 심볼릭 레퍼런스를 다이렉트 레퍼런스로 변경
+  - 초기화 
+    - 클래스 변수 초기화
+
+- Runtime Data Area (JVM Memory)
+
   - JVM이 운영체제로 부터 할당 받은 메모리 영역
-  - 모든 쓰레드가 공유하는 영역
-    - Method Area
-      - JVM 시작시 실행
-      - byte code 저장
-      - 클래스에 대한 정보 저장
-        - field :  멤버 변수명, 타입, 접근제어자
-        - method : 메소드 명, 리턴 타입, 접근제어자
-        - type : 클래스인지 인터페이스 인지
-      - runtime contraint pool
-        - 클래스 구성 요소들의 주소 저장
-        - 메소드나 필드 주소를 이곳에서 참조
-    - Heap Area
-      - new 로 생산된 객체를 저장하는 영역, GC의 대상
-  - 각 쓰레드 별 생성
-    - Stack Area
-      - 메소드 호출시 마다 생성(push)
-      - 메소드의 구성요소(지역변수, 파리마터, 리턴값) 저장
-      - 메소드 종료 후 삭제(pop)
-    - PC register
-      - 쓰레드 시작시 발생
-      - 현재 수행중인 JVM의 주소
-    - Native Method Stack
-      - 자바 외의 언어(C, C++)로 작성된 네이티브 코드(기계어)를 위한 영역
-  
+
+  - Class Loader로 부터 byte code가 전달된다
+
+  - 구조
+
+    - 모든 쓰레드가 공유하는 영역
+      - Method Area
+        - **클래스 정보를 처음 메모리로 올릴떄 초기화되는 대상을 저장하는 메모리 공간**
+
+        - 저장되는 클래스 정보
+          
+          - field :  멤버 변수명, 타입, 접근제어자
+          - method : 메소드 명, 리턴 타입, 접근제어자
+          - type : 클래스인지 인터페이스 인지
+          
+        - **runtime contraint pool (런타임 상수 풀)**
+
+          - 저장될떄 심볼릭 레퍼런스(논리적 주소 : 클래스의 풀네임) 형식으로 저장된다
+
+            - 클래스또는 인터페이스의 상수(리터럴)가 저장
+            - 모든 종류의 숫자, 문자열, 변수명 저장
+            - **클래스 정보 저장 -> 클래스, 메소드, 필드의 주소**
+
+          - 외부에서 참조시 실제 주소를 이용해서 참조한다
+
+          - 실행 예제
+
+            - 소스코드
+
+              ```java
+              public class Test {
+              	public static void main(String[] args) {
+              		Pair p1 = new Pair();
+              		p1.setA(2);
+              		p1.setB(3);
+              		System.out.println(p1.a);
+              		
+              		Pair p2 = new Pair();
+              		p2.setA(2);
+              		p2.setB(3);
+              		System.out.println(p2.a);
+              	}
+              }
+              
+              class Pair {
+              	int a, b;
+              
+              	public void setA(int a) {
+              		this.a = a;
+              	}
+              
+              	public void setB(int b) {
+              		this.b = b;
+              	}
+              }
+              
+              ```
+
+            - 바이트코드(javap 사용)
+
+              - constraint pool
+
+                ```java
+                Constant pool:
+                   #1 = Class              #2             // bytecode/Test
+                   #2 = Utf8               bytecode/Test
+                   #3 = Class              #4             // java/lang/Object
+                   #4 = Utf8               java/lang/Object
+                   #5 = Utf8               <init>
+                   #6 = Utf8               ()V
+                   #7 = Utf8               Code
+                   #8 = Methodref          #3.#9          // java/lang/Object."<init>":()V
+                   #9 = NameAndType        #5:#6          // "<init>":()V
+                  #10 = Utf8               LineNumberTable
+                  #11 = Utf8               LocalVariableTable
+                  #12 = Utf8               this
+                  #13 = Utf8               Lbytecode/Test;
+                  #14 = Utf8               main
+                  #15 = Utf8               ([Ljava/lang/String;)V
+                  #16 = Class              #17            // bytecode/Pair
+                  #17 = Utf8               bytecode/Pair
+                  #18 = Methodref          #16.#9         // bytecode/Pair."<init>":()V
+                  #19 = Methodref          #16.#20        // bytecode/Pair.setA:(I)V
+                  #20 = NameAndType        #21:#22        // setA:(I)V
+                  #21 = Utf8               setA
+                  #22 = Utf8               (I)V
+                  #23 = Methodref          #16.#24        // bytecode/Pair.setB:(I)V
+                  #24 = NameAndType        #25:#22        // setB:(I)V
+                  #25 = Utf8               setB
+                  #26 = Fieldref           #27.#29        // java/lang/System.out:Ljava/io/PrintStream;
+                  #27 = Class              #28            // java/lang/System
+                  #28 = Utf8               java/lang/System
+                  #29 = NameAndType        #30:#31        // out:Ljava/io/PrintStream;
+                  #30 = Utf8               out
+                  #31 = Utf8               Ljava/io/PrintStream;
+                  #32 = Fieldref           #16.#33        // bytecode/Pair.a:I
+                  #33 = NameAndType        #34:#35        // a:I
+                  #34 = Utf8               a
+                  #35 = Utf8               I
+                  #36 = Methodref          #37.#39        // java/io/PrintStream.println:(I)V
+                  #37 = Class              #38            // java/io/PrintStream
+                  #38 = Utf8               java/io/PrintStream
+                  #39 = NameAndType        #40:#22        // println:(I)V
+                  #40 = Utf8               println
+                  #41 = Utf8               args
+                  #42 = Utf8               [Ljava/lang/String;
+                  #43 = Utf8               p1
+                  #44 = Utf8               Lbytecode/Pair;
+                  #45 = Utf8               p2
+                  #46 = Utf8               SourceFile
+                  #47 = Utf8               Test.java
+                ```
+
+              - 바이트 코드
+
+                ```java
+                {
+                  public bytecode.Test();
+                    descriptor: ()V
+                    flags: (0x0001) ACC_PUBLIC
+                    Code:
+                      stack=1, locals=1, args_size=1
+                         0: aload_0
+                         1: invokespecial #8                  // Method java/lang/Object."<init>":()V
+                         4: return
+                      LineNumberTable:
+                        line 3: 0
+                      LocalVariableTable:
+                        Start  Length  Slot  Name   Signature
+                            0       5     0  this   Lbytecode/Test;
+                
+                  public static void main(java.lang.String[]);
+                    descriptor: ([Ljava/lang/String;)V
+                    flags: (0x0009) ACC_PUBLIC, ACC_STATIC
+                    Code:
+                      stack=2, locals=3, args_size=1
+                         0: new           #16                 // class bytecode/Pair
+                         3: dup
+                         4: invokespecial #18                 // Method bytecode/Pair."<init>":()V
+                         7: astore_1
+                         8: aload_1
+                         9: iconst_2
+                        10: invokevirtual #19                 // Method bytecode/Pair.setA:(I)V
+                        13: aload_1
+                        14: iconst_3
+                        15: invokevirtual #23                 // Method bytecode/Pair.setB:(I)V
+                        18: getstatic     #26                 // Field java/lang/System.out:Ljava/io/PrintStream;
+                        21: aload_1
+                        22: getfield      #32                 // Field bytecode/Pair.a:I
+                        25: invokevirtual #36                 // Method java/io/PrintStream.println:(I)V
+                        28: new           #16                 // class bytecode/Pair
+                        31: dup
+                        32: invokespecial #18                 // Method bytecode/Pair."<init>":()V
+                        35: astore_2
+                        36: aload_2
+                        37: iconst_2
+                        38: invokevirtual #19                 // Method bytecode/Pair.setA:(I)V
+                        41: aload_2
+                        42: iconst_3
+                        43: invokevirtual #23                 // Method bytecode/Pair.setB:(I)V
+                        46: getstatic     #26                 // Field java/lang/System.out:Ljava/io/PrintStream;
+                        49: aload_2
+                        50: getfield      #32                 // Field bytecode/Pair.a:I
+                        53: invokevirtual #36                 // Method java/io/PrintStream.println:(I)V
+                        56: return
+                      LineNumberTable:
+                        line 5: 0
+                        line 6: 8
+                        line 7: 13
+                        line 8: 18
+                        line 10: 28
+                        line 11: 36
+                        line 12: 41
+                        line 13: 46
+                        line 14: 56
+                      LocalVariableTable:
+                        Start  Length  Slot  Name   Signature
+                            0      57     0  args   [Ljava/lang/String;
+                            8      49     1    p1   Lbytecode/Pair;
+                           36      21     2    p2   Lbytecode/Pair;
+                }
+                ```
+
+              - 중요 부분
+                - `//`이 있는 부분이 바로 심볼릭 레퍼런스이다
+                - Pair 클래스 필드와 메소드 참조
+                  - 클래스 : #17
+                  - 필드
+                    - a : #32
+                  - 메소드
+                    - setA() : #19
+                    - setB() : #23
+      - Heap Area
+        - new 키워드로 생성한 객체를 저장하는 영역, GC의 대상
+
+    - 각 쓰레드 별 생성
+
+      - PC register
+        - 쓰레드 시작시 생성
+        - 현재 수행중인 명령어의 주소
+      - Stack Area
+        - 메소드 호출시 마다 스택프레임(메소드 만을 위한 공간) 생성(push)
+        - 메소드 정보(지역변수, 파리마터, 리턴값) 저장
+        - 메소드 종료 후 삭제(pop) -> 메모리 반환
+      - Native Method Stack
+        - 자바 외의 언어(C, C++)로 작성된 네이티브 코드(기계어)를 위한 영역
+        - 주로 커널에 접근하는 코드가 이곳에 존재
+
 - Execution Engine
-  - .class(byte code) 파일을 기계어(native code)로 번역(compile)후 명령어 실행
+
+  - byte code를 기계어(native code)로 변환 후 **명령어 실행**
   - 명령어 실행 방법
-    - Interpreter : 하나씩 실행
-    - JIT : 특정 시간에 전체 byte code를 native code로 변환
-    - compile 비교
+    - Interpreter 
+      - 명령어 하나씩 변환해서 실행
+      - 느리다
+    - JIT 컴파일러
+      - Interpreter 방식으로 실행하다가 특정 시간에 전체 byte code를 native code로 변환
+        - 통째로 변환하므로 interpreter보다 느림
+      - 변환한 native code는 캐시에 보관
+        - 한번 컴파일된 native 코드는 다음에 빠르게 수행가능
+        - 자주 실행되는 코드를 JIT로 변환하는게 좋다 
+          - 실제로 실행 빈도수를 체크하여 일정 정도를 넘을 떄 컴파일을 수행한다
+    - 비교
       - javac : source code -> byte code
-      - interpreter : byte code -> native code 
+      - JIT : byte code -> native code 
   - Garbage Collector
     - heap에 있는 객체 중 참조 되지 않는 객체 삭제
 
@@ -1381,7 +1598,7 @@
       - 메소드: `T get()`
       - 특징 : 매개변수X, 리턴O
     - `Consumer<T>`
-      - 메소드 : `void apccept(T t)`
+      - 메소드 : `void accept(T t)`
       - 특징 : 매개변수O, 리턴X
     - `Function<T,R>`
       - 메소드 : `R apply(T t)`
@@ -1517,6 +1734,7 @@
     import java.util.function.Function;
     import java.util.function.Predicate;
     
+    // 16진수 -> 2진수
     public class FunctionTest3 {
     	public static void main(String[] args) {
     		Function<String, Integer> f = (s) -> Integer.parseInt(s, 16);
@@ -1538,9 +1756,9 @@
     	}
     }
     ```
-
+    
     실행결과
-
+    
     ```
     11111111
     11111111
