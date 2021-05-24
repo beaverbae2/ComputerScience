@@ -356,11 +356,13 @@
  #### UDP
 
 - 특징
-  - 데이터를 보내는 것에 집중
+  - 신속하게 데이터를 보내는 것에 집중
   - connectionless : 그냥 목적지에 데이터를 보내기만 함
   - unreliable : 데이터가 유실되건 말건 신경 안씀
 - 사용
   - DNS
+    - 포트 번호 : 53
+    - UDP를 쓰는이유 :  request양이 적음, 연결을 유지할 필요없음
   - streaming multimedia (ex)유튜브)
 -  header 구조
   - src port
@@ -524,18 +526,20 @@
 
 #### TCP : Connection Management
 
-- **3-way-handshake(시작)**
-- SYN (c->s) : 계세요? (**header만 보냄**)
-  - SYN+ACK(s->c) : 예 있어요 (**header만 보냄**)
-  - ACK(c->s) : 데이터 보내유 (established)
-  
-- **4-way handshake (종료)**
+- 참고 자료
+  - https://asfirstalways.tistory.com/356
 
+- **3-way-handshake(시작)**
+  - SYN (c->s) : 계세요? (**header만 보냄**)
+    - SYN+ACK(s->c) : 예 있어요 (**header만 보냄**)
+    - ACK(c->s) : 데이터 보내유 (established)
+
+- **4-way handshake (종료)**
   - FIN (c->s) : 끝낼꼐유
   - ACK(s->c) : ㅇㅋㅇㅋ, client는 데이터 보내기 종료
   - FIN (s->c) : 끝났슈
   - ACK(c->s) : ㅇㅋㅇㅋ (client는 time wait 상태 - 자료 구조 해제X)
-
+  
   - **마지막에 time wait가 필요한 이유**
     - cilent가 server로 보낸 ACK가 유실되면, server쪽에서 timeout이 발생하여 FIN을 다시 보냄
 
