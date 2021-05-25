@@ -565,7 +565,7 @@
   - multiplicative decrease : loss 발생하면 보내는 패킷 수 **절반**으로 확 줄임
   
 - slow start
-  - 맨 처음에 패킷을 보낼 땐 1 MSS
+  - 맨 처음에 패킷을 보낼 땐 윈도우 크기 1 MSS
   - 이후 2배씩 증가(2^n)
   - ssthresh(slow start threshold)에 도달하면 additive increase
     - ssthresh = cwnd 크기 / 2
