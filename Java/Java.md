@@ -39,7 +39,7 @@
 - javac(자바 컴파일러)가 .java -> .class(byte code)로 변환
 - Class Loader를 통해 JVM에 class파일 로딩
 - Class Loader가 byte code를 Runtime Data Area에 배치
-- 배치된 byte code는 Runtime Data Area에 배치되어 실질적으로 수행
+- 배치된 byte code는 Execution Engine에 의해 실질적으로 수행
   - 이떄 필요에 따라 JVM은 쓰레드 동기화나 GC 진행
 
 #### JVM(Java Virtual Machine)의 구조
