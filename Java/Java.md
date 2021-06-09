@@ -6,7 +6,7 @@
 - [객체 지향의 4가지 특징](#객체-지향의-4가지-특징)
 - [final static abstract](#final-static-abstract)
 - [추상클래스와 인터페이스](#추상클래스와-인터페이스)
-- 제네릭
+- [제네릭](#제네릭)
 - [불변 객체](#불변-객체)
 - [예외처리](#예외처리)
 - [문자열 처리](#문자열-처리)
@@ -540,25 +540,28 @@
 
 ### 제네릭
 
+진짜 어렵다...
+
 - 제너릭이란
-  - 타입을 일반화 시키는 것(임의의 타입 선언) -> 다양한 타입의 인스턴스 사용 가능
-  - **컴파일 시에 타입 체크(타입 안정성 제공) 후 소거 -> 런타임시 타입 정보를 알 수 없음**
-  - 일반화된 타입은 컴파일시에 구체적인 타입으로 변환
+  - 타입을 일반화 시키는 것(임의의 타입 선언) 
+  - 객체를 생성할 때 구체적인 타입 지정
+  - 다양한 타입의 인스턴스 사용 가능
 
-- 제네릭의 선언
+- 장점
 
-  - 제너릭을 쓰지 않을 때
+  - 타입 안정성을 제공
+    - **컴파일시에만 타입 체크** 
+      - **인스턴스 생성시 지정한 구체적 타입으로 지정**
+    - **런타임 시에는 (앞서 지정한 구체적인) 타입 정보를 가지고 있지 않음 -> 타입 소거** 
+      - 런타임시 Object나 조상 클래스 타입이 들어올 수 있음
+      - 컴파일시에 이미 타입 체크를 했으므로 안전
+  - 타입체크와 형변환 생략 가능
 
-    ```java
-    class Box {
-        Object item;
-        
-        void setItem(Object item) { this.item = item; }
-        T getItem() { return item; }
-    }
-    ```
+- 제한이 없는 제네릭 클래스 (Unbound type)
 
-  - 제네릭 선언
+  - **무공변**
+
+  - 선언
 
     ```java
     class Box<T> {// T : 임의의 타입
@@ -571,35 +574,82 @@
 
     - 용어
       - `Box<T>` : 제네릭 클래스 
-      - `T` : 타입 매개변수, 제네릭 타입
+      - `T` : 타입 (매개)변수
       - `Box` : 원시 타입 (raw type)
-      - **참고) 컴파일 후에 타입 매개변수는 소거되고 원시 타입만 남는다**
+
+  - 타입 소거 후
+
+    ```java
+    class Box {
+        Object item;
+        
+        void setItem(Object item) { this.item = item; }
+        Object getItem() { return item; }
+    }
+    ```
+
+    - 타입 변수 T가 Object로 치환 
 
   - 제네릭 사용
 
     ```java
-    Box<String> box = new Box<String>();
+    Box<String> box = new Box<String>(); //객체 생성시 타입 지정
     box.setItem(new Object());// 컴파일 에러 : String 이외 타입 지정 불가
     box.setItem("ABC");
-    String item = box.getItem();// 형변환 필요없음 : item -> "ABC"
+    String item = box.getItem();// 형변환 필요없음 : 컴파일시 타입 체크를 했기 때문
     ```
 
-- 제네릭의 제한
-  - 다음의 경우에 제한
+  - 제한
+
     - static
-      - 제네릭은 객체를 생성할 때 타입을 지정
-      - static은 타입의 종류와 관계 없이 모든 객체에 동일하게 동작해야 하기 때문이다
-    - 배열에 사용 불가
-      - 제네릭은 컴파일시에 타입 체크 후 소거  -> 런타임시 타입을 알 수 없음
-      - 배열은 런타임 시에 타입 체크
+
+      - static은 모든 객체에 공유되어야 함
+      - 하지만 제네릭을 통해 다양한 타입의 인스턴스 생성 가능 -> 사용 불가
+
+    - 배열
+
+      - 배열 vs 제네릭
+
+        - 배열
+
+          - 공변 : 구체적인 방향으로 타입 변환 허용 (다형성)
+
+          - 구체화 타입(reifiable type) : 자신의 타입 정보를 런타임시에 알고 지킴
+
+          - 코드
+
+            ```java
+            Object[] objArr = new Long[1];
+            objArr[0] = "ABC";// 런타임 에러 발생
+            ```
+
+        - 제네릭
+
+          - 무공변 : 변환 불가
+
+          - 비구체화 타입(non-reifiable type) : 런타임시에 구체적인 타입 정보가 없음(타입입 소거 때문)
+
+          - 코드
+
+            ```java
+            List<Object> objList = new ArrayList<Long>();// 컴파일 에러 발생
+            objList.add("ABC");
+            ```
+
+        - 결론
+
+          - 제네릭 클래스에 배열이 멤버 변수로 있다면
+            - 제네릭은 컴파일 시 (<u>객체 생성 시 지정한 구체적</u>) 타입 체크 후 타입 소거함
+            - 배열은 런타임시 타입 체크를 해야되는데 (구체적인) 타입 정보가 없음
+            - 오류 발생
 
 - 제네릭 클래스의 객체 생성과 사용
 
-  - 타입 파라미터와 원시 타입으로 나눠서 생각하자
+  - 원시 타입과 타입 변수로 나눠서 생각하자
 
     - 기본적으로 `Box<Fruit> box` 로 변수가 선언되어 있다면 
       - 인스턴스로 `new Box<Fruit>()` 만 사용 가능 ( 또는 `new Box<>()`)
-    - 타입 파라미터는 다형성 불가능, 원시타입은 다형성 가능
+    - 원시타입은 다형성 가능(타입변수가 같을때), 타입 변수는 불가능
 
   - 예시
 
@@ -628,9 +678,9 @@
       fruitBox2.add(new Apple());//add 메소드의 인자 타입이 Fruit이므로 사용 가능
       ```
 
-- 제한된 제네릭 클래스
+- 제한된 제네릭 클래스 (Bounded type)
 
-  - 타입 파라미터로 받을 수 있는 타입을 제한
+  - 타입 변수를 제한
 
   - `<T extends XXX>` 
 
@@ -640,29 +690,89 @@
       - `&` 사용
       - `<T extends XXX & YYY>` : XXX의 자손이면서 동시에 YYY의 자손인 타입만 사용가능 
 
-  - 예시
+  - 선언
 
     ```java
-    // 기존 FruitBox의 타입 파라미터를 Fruit로 제한
-    class FruitBox<T extends Fruit> extends Box<T> {}
+    // 기존 FruitBox의 타입 변수를 Fruit로 제한
+    class FruitBox<T extends Fruit> extends Box<T> {
+        List<T> list = new ArrayList<>();
+        
+        void add(T fruit) {
+            list.add(fruit);
+        }
+        
+        T get(int i) {
+            return list.get(i);
+        }
+    }
+    ```
+    
+  - 타입 소거 후
+
+    ```java
+    class FruitBox extends Box {
+        List list = new ArrayList();
+        
+        void add(Fruit fruit) {// T가 Fruit로 치환
+            list.add(fruit);
+        }
+        
+        Fruit get(int i) {// T가 Fruit로 치환
+            return (Fruit) list.get(i); // 형변환 (Object타입을 반환하므로) 
+        }
+    }
     ```
 
 - 와일드 카드
 
-  - 제네릭 타입의 다형성 지원
+  - 제네릭 클래스의 한계점을 해결
 
-  - 사용법
+  - 종류
 
     - `<? extends T>` : 상한 제한, T와 그 자손들만 가능
+
+      - **공변 : 추상 -> 구체** 
+      - **읽기만 가능**
+
     - `<? super T>` : 하한 제한, T와 그 조상들만 가능
-    - `<?>` : 제한 없음, 모든 타입 가능 == `<? extends Object>`
+
+      - **반공변 : 구체 -> 추상** 
+      - **쓰기만 가능**
+
+    - `<?>` : 제한 없음, 모든 타입 가능, `<? extends Object>` 와 동일
+
+    - extends와 super의 비교 -> 기준 : 다형성
+
+      ```java
+      public void doSomething(List<? extends MyClass> list) {
+          for (MyClass e : list) { // Ok (조상 타입(MyClass)으로 구체 타입(?) 참조 가능)
+              System.out.println(e);
+          }
+      }
+      
+      public void doSomething(List<? extends MyClass> list) {
+          list.add(new MyClass()); // Compile Error (구체 타입(?)으로 조상 타입(MyClass) 참조 불가)
+      }
+      
+      public void doSomething(List<? super MyClass> list) {
+          for (MyClass e : list) { //  Compile Error (구체 타입(MyClass)으로 조상 타입(?) 참조 불가)
+              System.out.println(e);
+          }
+      }
+      
+      public void doSomething(List<? super MyClass> list) {
+          list.add(new MyClass()); // Ok (조상 타입(?)으로 구체 타입(MyClass) 참조 가능)
+      }
+      ```
 
   - 예시 - 과일 종류 별로 주스 만들기
 
-    - 제네릭 타입이 다른 경우는 오버로딩 불가능 - 오버로딩의 기준은 원시 타입
+    - 원시타입이 같아도 타입 변수가 다른 경우는 오버로딩 불가능 -> 타입소거로 인해
 
       ```java
-      class Juicer {// 주스기계 - 컴파일 에리 발생
+      class Juicer {// 주스기계
+          // 아래 두 메소드는 서로 같은 메소드 취급 - 컴파일 에러 발생
+          // static 메소드가 사용되었음에 유의
       	static Juice makeJuice(FruitBox<Fruit> box) {
       		String tmp = "";
       		for (Fruit f : box.list) tmp += f;
@@ -681,6 +791,8 @@
 
       ```java
       class Juicer {
+          // static 메소드가 사용되었음에 유의
+          // Fruit와 하위 타입을 인자로 받을 수 있다
       	static Juice makeJuice(FruitBox<? extends Fruit> box) {
       		String tmp = "";
       		for (Fruit f : box.list) tmp += f;// FruitBox의 제네릭 타입은 Fruit로 제한되어 있기 떄문에 사용 가능
@@ -690,7 +802,86 @@
       ```
 
 - 제네릭 메소드
+  
   - 메소드 선언부에 지네릭 타입이 선언
+  
+  - **제네릭 클래스에 정의된 타입 변수와는 별개**
+  
+    - 사용법은 제네릭 클래스와 거의 동일
+    - `<T>` 와 `<T extends XXX>` 사용가능
+  
+  - **해당 메소드에서 지역 변수처럼 사용**
+  
+    - 매개 변수 타입
+    - 리턴 타입
+  
+  - 사용 예시
+  
+    - 과일 종류 별로 주스 만들기
+  
+      - 세팅
+  
+        ```java
+        class Juicer {
+            // static 클래스임에 유의
+            static <T extends Fruit> Juice makeJuice(FruitBox<T> box) {
+        		String tmp = "";
+        		for (Fruit f : box.list) tmp += f;
+        		return new Juice(tmp);
+        	}
+        }
+        ```
+  
+      - 실행
+  
+        ```java
+        FruitBox<Fruit> fruitBox = new FruitBox<>();
+        FruitBox<Apple> appleBox = new FruitBox<>();
+        
+        System.out.println(Juicer.<Fruit>makeJuice(fruitBox));
+        System.out.println(Juicer.makeJuice(fruitBox));// 타입 추론
+        System.out.println(Juicer.<Apple>makeJuice(appleBox));
+        System.out.println(Juicer.makeJuice(appleBox));// 타입 추론
+        ```
+  
+    - `Collections.sort()` 메소드
+  
+      - 구조
+  
+        ```java
+        public static <T extends Comparable<? super T>> void sort(List<T> list) {
+            list.sort(null);
+        }
+        ```
+  
+      - 의미
+        - list의 타입 :  T
+        - T는 Comparable을 구현한 클래스
+        - Comparable의 타입은 T와 그 조상
+  
+- 제네릭의 형변환
+
+  - 타입 변수의 타입이 다르면 형변환 불가
+
+    ```java
+    Box<Object> objBox = null;
+    Box<String> strBox = null;
+    
+    objBox = (Box<Object>) strBox;// 형변환 불가
+    strBox = (Box<String>) objBox;// 형변환 불가
+    ```
+
+  - 와일드카드를 사용한 형변환
+
+    ```java
+    Box<? extends Object> objBox1 = new Box<String>();// 형변환 가능
+    
+    FruitBox<? extends Fruit> box1 = new FruitBox<Fruit>();// 형변환 가능
+    FruitBox<? extends Fruit> box2 = new FruitBox<Apple>();// 형변환 가능
+    
+    Box<?> extends objBox2 = new Box<?>();// 타입이 정해지지 않았으므로 불가능
+    Box<?> extends objBox3 = new Box<>();// 가능(?는 ? extends Object와 동일)
+    ```
 
 <br>
 
