@@ -329,7 +329,7 @@
     - Survivor : GC 발생 후 남은 객체들이 쌓이는 곳
       - **Survivor0, Surivivor1 둘 중 하나만 쓰인다**
   - 구체적인 과정 
-    - 새로 생성한  Eden에 쌓임
+    - 새로 생성한 객체가  Eden에 쌓임
     - Eden 영역에서 GC 발생, 살아 남은 객체는 Survivor영역중 하나로 이동
     - 살아남은 객체들이 Survivor에 지속적으로 쌓임
     - 하나의 Survivor 영역이 가득차게 되면 GC 발생, 살아남은 객체는 다른 Survivor 영역으로 이동(**age 증가**)
@@ -341,27 +341,25 @@
 - 종류
   - Serial GC
     - GC를 처리하는 쓰레드가 한 개, 시간이 오래 걸림
-    - Mark-Sweap-Compact 
+    - Mark-Sweap-Compaction
       - Mark and Sweap 하는건 동일
-      - Compact : 파편화된 할당 메모리 한쪽으로 모음(살아있는 객체들이 메모리에 연속되게 존재하도록 함)
-    
+      - Compaction : 객체가 존재하는 부분과 없는 부분으로 나눔 -> 외부 단편화 문제 해결
   - Parallel GC
     - Serial GC와 동일, 단 GC 처리 쓰레드가 여러개
     - java8 default GC
-    
   - CMS(Concurrent Mark Sweap) GC 
+    - stop the world 시간 줄이기 위해서 나옴
     - 과정
-
-      - Initial mark :  **stack에서 참조**하는 reachable한 객체 마킹 (stop the world)
-
+  
+      - Initial mark :  클래스 로더에서 가장 가까운 객체 중 살아있는 객체만 찾음 (stop the world - 짧음)
+  
       - Concurrent mark : intial mark때 확인했던 **reachable한 객체들이 참조하는 객체들을 따라가며 마킹** (stop the world X (다른 쓰레드들도 진행 중))
       - Remark : Concurrent mark 단계에서 새로 추가되거나 참조가 끊긴 객체 확인 -> 최종적으로 reachable한 객체 확인 (stop the world)
-      - Concurrent Sweap :  객체 제거 (stop the world X)
-
+      - Concurrent Sweap :  unreacable한 객체 제거 (stop the world X)
+  
     - 특징
       - Stop-the-World 기간을 줄임 -> 빠름
       - Compact알고리즘 진행X
-
   - G1 GC
     
     - 기존 GC 원리와 다름
