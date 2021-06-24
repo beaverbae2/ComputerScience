@@ -1128,7 +1128,7 @@
 - 예외 클래스의 계층 구조
   -  Throwable
      -  Exception
-         -  (Checked Exception) - compile 시 확인 (외적 요인에 의해 발생)
+         -  (Checked Exception) - compile 시 확인 (외적 요인에 의해 발생) => 예외 처리 안하면 compile 오류 발생
              -  IOException
              -  ....
              -  ClassNotFoundException
@@ -1138,6 +1138,10 @@
              -  ...
              -  IndexOutOfBoundException
 
+- 예외처리 목적
+
+  - **프로그램의 비정상적인 종료를 막고, 정상적인 실행상태 유지**
+
 - 예외 처리 방법
 
   - try-catch-finally
@@ -1145,181 +1149,200 @@
     ```java
     try {
         // 예외를 처리하길 원하는 실행 코드 (예외가 발생할 수 있는 코드)
-    } catch (e1) {
+    } catch (XxxException e1) {
         // e1 예외가 발생시 실행되는 코드
-    } catch (e2) {
+        // e1.printStackTrace();
+        // e1.getMessage();
+    } catch (Yyy Exception e2) {
         // e2 예외가 발생시 실행되는 코드
-    } finally {
-        // 예외 발생 여부와 관계 없이 실행 
+    } final
+        // 예외 발생 여부와 관계 없이 실행, 마지막에 반드시 실행 시키야되는 코드가 있을 떄 사용
     }
     ```
+
+    - 흐름
+      - try 블럭에서 예외가 발생한 경우
+        - **더이상 try 블럭의 코드가 실행되지 않음**
+        - 발생한 예외에 해당하는 인스턴스 생성
+        - 해당 인스턴스의 타입을 매개변수로하는 catch 블럭이 있는지 **위에서 부터 순서대로** 확인 -> 정확히는 `instanceof` 로 타입 검사
+          - 있다면 : 예외처리O -> try-catch 블럭을 빠져나옴
+          - 없다면 : 예외처리X -> 비정상 종료
+      - 예외가 발생하지 않은 경우
+        - catch블럭 거치지 않고(try 블럭만 실행하고), try-catch 블럭을 빠져나옴
+    - `printStackTrace()` 와 `getMessage()`
+      - `printStackTrace()`  : 예외메시지와 호출 스택에 있던 메소드 정보 출력
+      - `getMessage()` : 예외 인스턴스에 저장된 메시지 출력
 
   - throw, throws
 
     - throw : 강제로 예외 발생 시키기
-
     - throws 
-
-      - 메소드를 호출한 상위 메소드에 예외를 전달
-      - 반드시 상위 메소드 중 하나에서 처리 되어야함
+      - 메소드에서 발생할 수 있는 예외 명시
+        - 해당 해소드를 호출한 상위 메소드로 예외 넘김
+      - 반드시 상위 메소드 중 하나에서 예외 처리를 해야함
         - try-catch 사용해서 처리
-        - main (최상위 메소드) 까지 예외가 전달 되었다면
-          - try-catch
-          - throws
 
-    - 사용자 정의 예외 클래스 
+  - 사용자 정의 예외 클래스 
 
-      - Exception이나 RuntimeException 클래스를 상속받아 구현 
-      - Exception을 상속하는 경우 예외를 올바로 처리하지 않으면 컴파일 에러 발생
-      - RuntimeException을 상속하는 경우 컴파일 에러 발생X
+    - Exception이나 RuntimeException 클래스를 상속받아 구현 
+    - Exception을 상속하는 경우 예외 처리를 안하면 컴파일 에러 발생
+    - RuntimeException을 상속하는 경우 예외처리를 안해도 컴파일 에러 발생X
 
-    - 구현 예시
+  - 구현 예시
+
+    - 사용자 정의 예외 - RuntimeException 상속
 
       ```java
-      // 배열로 stack구현
-      class MyStack {
-      	int[] arr;
-      	int size;
-      	int top;
-      	
-      	{
-      		top = 0;
-      	}
-      	
-      	public MyStack(int size) {
-      		this.arr = new int[size];
-      		this.size = size; 
-      	}
-      	
-      	public void push(int data) throws FullException {// 이를 호출한 상위 메소드에서 예외 처리
-      		if (isFull()) {
-      			throw new FullException("stack is full!");// 예외발생 시키기
-      		} else {
-      			arr[top++] = data;
-      		}
-      	}
-      	
-      	public int pop() throws EmptyException {// 이를 호출한 상위 메소드에서 예외 처리
-      		if (isEmpty()) {
-      			throw new EmptyException("stack is empty!");// 예외발생 시키기
-      		} else {
-      			top--;
-      			return arr[top];
-      		}
-      	}
-      	
-      	public boolean isEmpty() {
-      		if (top == 0) return true;
-      		return false;
-      	}
-      	
-      	public boolean isFull() {
-      		if (top == size) return true;
-      		return false;
+      class StackisFullException extends RuntimeException {
+      	public StackisFullException() {
+      		super("Stack is Full");
       	}
       }
       
+      class StackisEmptyException extends RuntimeException {
+      	public StackisEmptyException() {
+      		super("Stack is Empty");
+      	}
+      }
       ```
 
-      - 사용자 정의 예외 - Exception 상속
+    - 스택
 
-        ```java
-        //사용자 정의 예외 클래스 구현
-        class EmptyException extends Exception{
-        	/**
-        	 * add this because Serializable
-        	 */
-        	private static final long serialVersionUID = 1L;
-        
-        	public EmptyException() {
-        		super();
-        	}
-        	
-        	public EmptyException(String msg) {
-        		super(msg);
-        	}
-        }
-        
-        //사용자 정의 예외 클래스 구현
-        class FullException extends Exception{
-        	/**
-        	 * add this because Serializable
-        	 */
-        	private static final long serialVersionUID = 1L;
-        
-        	public FullException() {
-        		super();
-        	}
-        	
-        	public FullException(String msg) {
-        		super(msg);
-        	}	
-        }
-        ```
-        - 예외 처리 - main
+      ```java
+      class MyStack {
+      	int[] arr;
+      	int top;
+      	
+      	public MyStack(int size) {
+      		this.arr = new int[size];
+      		this.top = 0;
+      	}
+      	
+          // RuntimeException의 경우 throws를 명시 안해줘도 되긴함, Exception은 반드시 throws 명시
+      	public void push(int data) throws StackisFullException {
+      		if (top == arr.length) {
+      			throw new StackisFullException();
+      		}
+      		System.out.println("push : "+data);
+      		arr[top++] = data;
+      	}
+      	
+      	public int pop() throws StackisEmptyException {
+      		if (top == 0) throw new StackisEmptyException();
+      		top--;
+      		System.out.println("pop : "+arr[top]);
+      		return arr[top];
+      	}
+      }
+      ```
 
-          - 방법 1
+    - 예외 처리 - main
 
-            ```java
-            public class ExceptionTest {
-            	public static void main(String[] args) {
-            		MyStack stack = new MyStack(3);
-            		try {
-            			stack.push(1);
-            			stack.push(2);
-            			System.out.println(stack.pop());
-            			stack.push(3);
-            			stack.push(4);
-            			stack.push(5);
-            			System.out.println(stack.pop());
-            			System.out.println(stack.pop());
-            			System.out.println(stack.pop());
-            			System.out.println(stack.pop());
-            			System.out.println(stack.pop());
-            		} catch (FullException | EmptyException e) {
-            			e.printStackTrace();
-            		}
-            	}
-            }
-            ```
+      ```java
+      public class ExceptionTest {
+      	public static void main(String[] args) {
+      		System.out.println("start main");
+      		MyStack myStack = new MyStack(3);
+      		
+      		System.out.println("--------------------------------------------");
+      		try {
+      			myStack.push(1);
+      			myStack.push(2);
+      			myStack.pop();
+      			myStack.pop();
+      			
+      			myStack.push(3);
+      			myStack.push(4);
+      			myStack.push(5);
+      			myStack.push(6); // StackisFullException 발생
+      			
+      			myStack.pop();
+      			myStack.pop();
+      			myStack.pop();
+      		} catch (StackisFullException | StackisEmptyException e) {
+      			e.printStackTrace();
+      		}
+      		
+      		System.out.println("--------------------------------------------");
+      		
+      		myStack = new MyStack(3);
+      		try {
+      			myStack.push(1);
+      			myStack.push(2);
+      			myStack.pop();
+      			myStack.pop();
+      			myStack.pop();// StackisEmptyException 발생
+      			
+      			myStack.push(3);
+      			myStack.push(4);
+      			myStack.push(5);
+      		} catch (StackisFullException | StackisEmptyException e) {
+      			e.printStackTrace();
+      		}
+      		
+      		System.out.println("--------------------------------------------");
+      		System.out.println("end main");
+      	}
+      }
+      ```
 
-          - 방법 2
+    - 실행 결과
 
-            ```java
-            public class ExceptionTest {
-            	public static void main(String[] args) throws FullException, EmptyException {
-            		MyStack stack = new MyStack(3);
-            		//....
-                }
-            }
-            ```
+      ```java
+      start main
+      --------------------------------------------
+      push : 1
+      push : 2
+      pop : 2
+      pop : 1
+      push : 3
+      push : 4
+      push : 5
+      exceptionhandling.StackisFullException: Stack is Full
+      	at exceptionhandling.MyStack.push(ExceptionTest.java:62)
+      	at exceptionhandling.ExceptionTest.main(ExceptionTest.java:21)
+      --------------------------------------------
+      push : 1
+      push : 2
+      pop : 2
+      pop : 1
+      exceptionhandling.StackisEmptyException: Stack is Empty
+      	at exceptionhandling.MyStack.pop(ExceptionTest.java:69)
+      	at exceptionhandling.ExceptionTest.main(ExceptionTest.java:37)
+      --------------------------------------------
+      end main
+      ```
 
-            
+      - 예외가 처리되어 정상적으로 프로그램 종료
 
-      - 사용자 정의 예외 - RuntimeException 상속
+- 요약
 
-        ```java
-        //사용자 정의 예외 클래스 구현
-        class EmptyException extends RuntimeException{
-        	//...
-        }
-        
-        //사용자 정의 예외 클래스 구현
-        class FullException extends RuntimeException{
-        	//...
-        }
-        ```
-
-        - 예외 처리 - main
-
-          ```java
-          public class ExceptionTest {
-          	public static void main(String[] args) {
-          		MyStack stack = new MyStack(3);
-          		//....
-              }
-          }
-          ```
+  - 에러 vs 예외
+    - 에러 : 수습 불가능
+    - 예외 : 수습 가능 -> 예외처리
+    - 에러와 예외가 발생하면 프로그램이 비정상으로 종료된다
+  - 예외 처리
+    - 예외가 발생해도 프로그램이 종료되지 않고 정상적으로 동작하게 하게 처리
+    - 방법
+      - `try-catch`
+        - try 블럭
+          - 예외가 발생할 수 있는 코드 기술
+          - **예외가 발생한다면 try 블럭은 더이상 실행X**
+        - catch 블럭 
+          - try에서 발생한 예외 처리
+          - try 블럭에서 발생한 예외 인스턴스의 타입을 가지는 catch 블럭을 찾아 예외 처리
+        - finally 블럭
+          - 예외 발생 여부와 상관없이 항상 실행
+          - 마지막에 반드시 실행시켜야 하는 코드가 있을 때 사용
+      - `throw` 와 `throws`
+        - `throw` 
+          - 강제로 예외 발생
+        - `throws` 
+          - 현재 메소드에서 발생한 예외를 상위 메소드로 전달
+            - 반드시 상위 메소드 중 한 곳에서 예외처리(`try-catch`)를 해줘야 함
+          - 메소드에서 발생할 수 있는 예외를 명시적으로 나타내는 용도로도 사용
+            - `Exception` 은 반드시 `throws` 명시
+            - `RuntimeException`의 경우 `throws`를 명시 안해줘도 예외 처리 가능
 
 <br>
 
