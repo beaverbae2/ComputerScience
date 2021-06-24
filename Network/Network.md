@@ -539,9 +539,10 @@
   - ACK(s->c) : ㅇㅋㅇㅋ, client는 데이터 보내기 종료
   - FIN (s->c) : 끝났슈
   - ACK(c->s) : ㅇㅋㅇㅋ (client는 time wait 상태 - 자료 구조 해제X)
-  
-  - **마지막에 time wait가 필요한 이유**
-    - cilent가 server로 보낸 ACK가 유실되면, server쪽에서 timeout이 발생하여 FIN을 다시 보냄
+  - **client 측에서 바로 close하지 않고 time wait가 필요한 이유**
+    - cilent가 server로 보낸 ACK가 유실되거나 지연으로 인해 time out 발생하는 경우 
+      - server쪽에서 timeout이 발생하여 FIN을 client 에게 다시 보냄
+      - 이를 처리하기 위해 time wait하는 것
 
 <br>
 
