@@ -358,16 +358,17 @@
   - 신속하게 데이터를 보내는 것에 집중
   - connectionless : 그냥 목적지에 데이터를 보내기만 함
   - unreliable : 데이터가 유실되건 말건 신경 안씀
+  - 어플리케이션 단에서 데이터를 쪼개줘야함
+  
 - 사용
   - DNS
     - 포트 번호 : 53
     - UDP를 쓰는이유 :  request양이 적음, 연결을 유지할 필요없음
   - streaming multimedia (ex)유튜브)
--  header 구조
-  - src port
-  - dest port
-  - length
-  - checksum(에러 확인)
+  
+- header 구조
+
+  <img src="https://blog.kakaocdn.net/dn/bRTdQx/btqyWLhV8D9/2AWL5Fj2OGJ1VGDTeQQ6l1/img.gif" style="float:left;">
 
 <br>
 
@@ -434,17 +435,13 @@
 - 특징
 
   - connection-oriented : 1대1로 통신
-  - reliable : 데이터가 유실 안되게함
+  - reliable : 데이터가 유실 안되게 함
   - in-order : 순서 존재
-  - bi-directional
+  - bi-directional : 양방향
 
 - header 구조
 
-  - src port, dest port
-  - seq number(번호), ack number(잘 받았고 다음에 x번 segment 줘) -> in-order
-  - flag (SYN, FIN, ISN, .. 총 6개)
-  - receive window
-  - checksum
+  <img src="https://blog.kakaocdn.net/dn/b2OtbA/btqAMlJTLi1/CTJcSSlZ7qzxlBrmgc5Pb1/img.png">
 
 <br>
 
@@ -499,13 +496,12 @@
     - 해결 : probe 패킷(41바이트(헤더 40바이트+데이터 1바이트)) 전송
 - Silly window syndrome -> segment사이즈를 어떻게 결정하는가
   - **segment사이즈가 작아지는 경우**
-
     - sender측의 앱에서 데이터를 천천히 만들거나
     - receiver측의 앱에서 받은 데이터 처리가 늦거나
   - segment사이즈는 클 수록 좋음 -> header크기에 대한 overhead감소
   - MSS (Maximum Segment Size) : 1500byte
   - 참고
-
+  
     - Nagle 알고리즘(sender)
       - 목적 : 최대한 큰 segment를 보내자
       - 동작 방식
@@ -531,8 +527,8 @@
 
 - **3-way-handshake(시작)**
   - SYN (c->s) : 계세요? (**header만 보냄**)
-    - SYN+ACK(s->c) : 예 있어요 (**header만 보냄**)
-    - ACK(c->s) : 데이터 보내유 (established)
+  - SYN+ACK(s->c) : 예 있어요 (**header만 보냄**)
+  - ACK(c->s) : 데이터 보내유 (established)
 
 - **4-way handshake (종료)**
   - FIN (c->s) : 끝낼꼐유
