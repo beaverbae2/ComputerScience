@@ -1995,21 +1995,21 @@
       - 특징 : 매개변수X, 리턴X
     - `Supplier<T>`
       - 메소드: `T get()`
-      - 특징 : 매개변수X, 리턴O
+      - 특징 : 매개변수X, 리턴O (`T`)
     - `Consumer<T>`
       - 메소드 : `void accept(T t)`
-      - 특징 : 매개변수O, 리턴X
+      - 특징 : 매개변수O (`T`), 리턴X
     - `Function<T,R>`
       - 메소드 : `R apply(T t)`
-      - 특징 : 매개변수O, 리턴O
+      - 특징 : 매개변수O (`T`), 리턴O (`R`)
       - 변형
-        - `UnaryOperator<T,T>`
+        - `UnaryOperator<T>`
     - `Predicate<T>`
       - 메소드 : `boolean test(T t)`
-      - 특징 : 매개변수O, 리턴O (boolean)
+      - 특징 : 매개변수O (`T`), 리턴O (`boolean`)
   - 매개변수가 2개
     - `BiConsumer<T,U>`
-    - `BiFunction<T,U,R>` -> 변형 : `BinaryOperator<T,T>`
+    - `BiFunction<T,U,R>` -> 변형 : `BinaryOperator<T>`
     - `BiPredicate<T,U>`
 
   - 3개 이상? -> 함수형 인터페이스로 직접 정의
