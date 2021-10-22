@@ -284,16 +284,118 @@
 
 <br>
 
-### 관계 데이터 연산
+### SQL(MySQL)
 
-- 데이터 모델의 구성 요소
-  - 데이터 구조
-  - 제약 조건
-  - 연산
-- 관계 데이터 연산
-  - 관계 대수 : 원하는 결과(릴레이션)를 얻기 위해 데이터 처리 과정을 순서대로 기술
-  - 관계 해석 : 원하는 결과를 얻기 위해 처리를 원하는 데이터만 기술
-  - 관계 대수와 관계 해석은 서로 호환 가능
+> 모든 연산의 기본 단위는 튜플 (하나)임
+
+#### 쿼리 작동 순서
+
+1. **FROM**
+2. **ON**
+3. **JOIN**
+4. **WHERE**
+5. **GROUP BY**
+6. CUBE | ROLLUP
+7. **HAVING**
+8. **SELECT**
+9. DISTINCT
+10. **ORDER BY**
+11. TOP
+
+<br>
+
+#### 집계 함수
+
+- COUNT()
+- SUM()
+- AVG()
+- MIN()
+- MAX()
+
+<br>
+
+#### GROUP BY / HAVING
+
+- 참고 자료 : https://wkdtjsgur100.github.io/groupby-having/
+
+**GROUP BY**
+
+특정 속성의 값이 같은 튜플을 모아 그룹을 만들고, 그룹별로 검색(중복제거, NULL취급x)
+
+- 장점
+  - 집계함수를 사용하기 용이
+
+**HAVING**
+
+그룹화된 결과에 대해 조건절 수행
+
+- WHERE문과 동일
+- WHERE문과 다르게 집계함수 사용가능
+
+**예시**
+
+- 컬럼 그룹화
+
+  ```mysql
+  SELECT 컬럼 FROM 테이블 GROUP BY 그룹화할 컬럼;
+  ```
+
+- 조건 처리 후 컬럼 그룹화
+
+  ```mysql
+  SELECT 컬럼 FROM 테이블 WHERE 조건식 GROUP BY 그룹화할 컬럼;
+  ```
+
+- 컬럼 그룹화 후 조건 처리
+
+  ```mysql
+  SELECT 컬럼 FROM 테이블 GROUP BY 그룹화할 컬럼 HAVING 조건식;
+  ```
+
+- 조건 처리 후 그룹화 후에 조건 처리
+
+  ```mysql
+  SELECT 컬럼 FROM 테이블 WHERE 조건식 
+  GROUP BY 그룹화할 컬럼 HAVING 조건식;
+  ```
+
+- ORDER BY가 존재하는 경우
+
+  ```mysql
+  SELECT 컬럼 FROM 테이블 WHERE 조건식 
+  GROUP BY 그룹화할 컬럼 HAVING 조건식
+  ORDER BY 컬럼;
+  ```
+
+
+<br>
+
+#### JOIN
+
+- 참고 자료 : https://yoo-hyeok.tistory.com/98
+
+> 테이블간 공통특성을 통해 여러 테이블에서 가져온 튜플들의 집합
+
+![](https://t1.daumcdn.net/cfile/tistory/99219C345BE91A7E32)
+
+#### SUB QUERY
+
+- 참고자료 : https://mjn5027.tistory.com/51
+
+> 메인 쿼리문 안에 또 다른 쿼리문이 있는 것, 서브 쿼리가 먼저 실행
+
+종류
+
+- SELECT 절 서브쿼리 (스칼라 서브쿼리)
+  - 단일 속성이나 단일 값으로 리턴되어야 함
+- FROM 절 서브쿼리 (inline view 서브쿼리)
+  - 하나의 테이블로 리턴되어야 함
+- WHERE 절 서브쿼리(중첩 서브쿼리)
+  - 단일 속성과 다중 속성으로 리턴 가능
+  - 단일 속성
+    - `>`, `>=`, `<` , `<=`, `=` 
+  - 다중 속성
+    - IN, ALL, ANY, EXISTS
 
 <br>
 
