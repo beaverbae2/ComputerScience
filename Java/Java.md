@@ -1420,18 +1420,19 @@
   - [Nesoy Blog - Java의 직렬화란?](https://nesoy.github.io/articles/2018-04/Java-Serialize)
   - [Stop the world - Java 객체 직렬화와 역직렬화](https://flowarc.tistory.com/entry/Java-%EA%B0%9D%EC%B2%B4-%EC%A7%81%EB%A0%AC%ED%99%94Serialization-%EC%99%80-%EC%97%AD%EC%A7%81%EB%A0%AC%ED%99%94Deserialization)
   - Java의 정석 - 직렬화Part (p.934~p.944)
-  
-  
+  - [madplay - [이펙티브 자바 3판] 12장. 직렬화](https://madplay.github.io/post/effectivejava-chapter12-serialization)
   
 - 직렬화, 역직렬화
 
-  - 직렬화 
-    - 객체를 데이터 스트림(바이트 코드)으로 변환
-    - **인스턴스 변수만 직렬화의 대상**
-  - 역직렬화 
-    - 데이터 스트림을 객체로 변환
   - 직렬화의 목적
-    - 객체를 저장했다가 다시 꺼내쓸 때, 또는 서로 간의 객체를 주고 받기 위해 직렬화 사용
+    - 자바 시스템간에 객체를 저장하거나 전송하기 위함
+  - 직렬화 
+    - 객체 -> 데이터 스트림(바이트 코드)
+      - <u>객체 그래프</u>를 따라가며 진행
+    - **인스턴스 변수만 직렬화의 대상(클래스 변수는 대상x)**
+  - 역직렬화 
+    - 데이터 스트림 -> 객체
+  - `Object` 타입 객체는 직렬화 불가
 
 - 구현
 
@@ -1500,13 +1501,12 @@
 
       - 조건
 
+        - 직렬화 했을 때와 같은 클래스를 사용해야함, 같은 클래스더라도 클래스의 내용이 변경된 경우 역직렬화 실패
         - 직렬화와 역직렬화를 진행하는 시스템이 서로 다를 수 있음을 인지
         - 동일한 `serialVersionUID`를 가지고 있어야 함
-        
+          - `serialVersionUID` : 클래스 버전(기본값 : 클래스의 기본 해쉬값)
           - `serialVersionUID`는 클래스가 변경(메소드 or 필드 변경) 될 때마다 변경
-          - 그렇기에 일반적으로 클래스의 필드에 `serialVersionUID` 명시 동일한 값을 갖게 함
           - `serialVersionUID`가 다를 경우 `java.io.InvalidClassException` 발생
-          - `serialVersionUID` 가 같아도 변수의 type이 달리진 경우 역직렬화 불가
         - **직렬화할 때와 역직렬화 할 때의 순서는 동일해야 함**
           - List에 데이터를 저장하는것이 편하다
         
@@ -1595,6 +1595,23 @@
               }
             }
             ```
+
+- 직렬화의 단점
+  - 다른 포맷(ex) JSON)에 비해 큰 용량
+  - 위험함
+    - 역직렬화시 사용되는 `ObjectOutputStream` 의 `readObject()` 메소드
+      - 매개변수로 바이트 스트림을 받는 **생성자**
+      - 바이트 스트림의 불변성이 깨지면 문제 발생
+      - 해결(순서대로 수행)
+        - 방어적 복사 : 복사본을 리턴해서 클라이언트 측에서 수정해도 원본 객체의 값은 변하지 않게함
+        - 유효성 검사 : 데이터 무결성 확인
+  - 대안 : XML, JSON, ...
+
+- 요약
+
+  ![img](https://postfiles.pstatic.net/MjAxNzExMTdfOTMg/MDAxNTEwODk4OTAzOTgx.-b5ljPnLfaNGLZdcPkUZ2_LoS-5-BLxRfxzwlm2qsSMg.YcnYVCUFjqa7lyTj8osxs3-g4YNLn29D0iVMq-kpyhcg.PNG.kkson50/%EC%A7%81%EB%A0%AC%ED%99%94_serialization_%EC%97%AD%EC%A7%81%EB%A0%AC%ED%99%94_serialversionuid%EC%B2%B4%ED%81%AC.png?type=w2)
+
+
 
 <br>
 
