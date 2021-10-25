@@ -196,20 +196,14 @@
 
 <br>
 
-## HashTable
-
-### HashTable
+## Hashing
 
 **참고자료**
 
-- https://mangkyu.tistory.com/102
-- [https://velog.io/@cyranocoding/Hash-Hashing-Hash-Table%ED%95%B4%EC%8B%9C-%ED%95%B4%EC%8B%B1-%ED%95%B4%EC%8B%9C%ED%85%8C%EC%9D%B4%EB%B8%94-%EC%9E%90%EB%A3%8C%EA%B5%AC%EC%A1%B0%EC%9D%98-%EC%9D%B4%ED%95%B4-6ijyonph6o](https://velog.io/@cyranocoding/Hash-Hashing-Hash-Table해시-해싱-해시테이블-자료구조의-이해-6ijyonph6o)
-
-<br>
+- [cyranocoding - Hash, Hashing, HashTable 자료구조의 이해](https://velog.io/@cyranocoding/Hash-Hashing-Hash-Table%ED%95%B4%EC%8B%9C-%ED%95%B4%EC%8B%B1-%ED%95%B4%EC%8B%9C%ED%85%8C%EC%9D%B4%EB%B8%94-%EC%9E%90%EB%A3%8C%EA%B5%AC%EC%A1%B0%EC%9D%98-%EC%9D%B4%ED%95%B4-6ijyonph6o)
+- [한재엽 - HashTable](https://github.com/JaeYeopHan/Interview_Question_for_Beginner/tree/master/DataStructure#hash-table)
 
 **주요 키워드 : key, value, bucket, hash, hash function**
-
-<br>
 
 **정의**
 
@@ -217,27 +211,23 @@
 - key를 통해 value 획득
 - key는 고유하다
 
-<br>
-
 **구조**
+
+![img](https://media.vlpt.us/post-images/cyranocoding/8d25f580-b225-11e9-a4ce-730fc6b3757a/1iHTnDFd3sR5FqjHD1FDu9A.png)
 
 - 구성요소
   - key : 고유값
-  - hash function : key -> hash
+  - hash function : key -> hash(hashcode)
   - bucket : hash를 인덱스로 하여 value를 저장하는 배열
 - 동작
   - key가 hash function을 통해 hash로 변경
   - hash는 value와 1:1 매칭이 되어 bucket에 저장
-
-<br>
 
 **시간 복잡도**
 
 - 삽입, 삭제, 검색
   - 평균 : O(1)
   - 최악 : O(N) -> 충돌발생시 가능
-
-<br>
 
 **해시 충돌 (Hash collision)**
 
@@ -246,23 +236,14 @@
   - key는 무한개이고 hash는 유한하므로
 - 해결방법
   - 서로 상보적임
-  - 분리연결법(Separate Chaining)
-    - 기존 값과 총돌 값을 list 또는 tree로 연결
-    - 장점
-      - 한정된 bucket을 효울적 사용가능
-      - hash function의 성능에 덜 의존적
-    - 단점
-      - 한 hash에 자료가 쏠리면 검색 효율 저하
-      - 외부 저장 공간 사용(list)
-    - 삽입, 삭제, 탐색
-      - 최적 : O(1)
-      - 최악 : O(N) -> 하나의 해시에 모든 원소가 들어있는 경우
+
   - 개방주소법(Open Addressing)
-    - 비어있는 해시를 찾아서 저장
+
+    - 비어있는 다른 해시 버킷을 찾아서 저장
     - 방법
-      - 선형 탐색(Linear Probing) : 다음 hash(+1) or n개(+n)를 건너뛰어서 비어있는 hash에 저장
-      - 제곱 탐색(Quadratic Probing) : 충돌 발생한 hash의 제곱을 한 hash에 저장
-      - 이중 해시(Double Hashing) : 다시 해시 함수를 한 번 더 적용하여 새로운 hash 해당
+      - 선형 탐색(Linear Probing) : 순차적으로 탐색하여 비어있는 버킷을 찾아서 저장
+      - 제곱 탐색(Quadratic Probing) : 2차함수를 활용해 탐색할 위치를 찾음
+      - 이중 해시(Double Hashing) : 2차 해시 함수를 용하여 새로운 위치를 찾음(연산량 많음)
     - 장점
       - 외부 저장 공간 필요 없음
     - 단점
@@ -271,7 +252,25 @@
       - 최적 : O(1)
       - 최악 : O(N)
 
-<br>
+  - 분리연결법(Separate Chaining)
+
+    ![img](https://media.vlpt.us/post-images/cyranocoding/329e7e60-b226-11e9-a4ce-730fc6b3757a/16eBeaqTti8MxWPsw4xBgw.png)
+
+    - 기존 값과 총돌 값을 list 또는 tree(red-black tree)로 연결
+    - 데이터가 적으면 list가 많으면 tree가 유리함
+    - 장점
+      - 한정된 bucket을 효울적 사용가능
+      - hash function의 성능에 덜 의존적
+    - 단점
+      - 한 hash에 자료가 쏠리면 검색 효율 저하
+      - 외부 저장 공간 사용
+    - 삽입, 삭제, 탐색
+      - 최적 : O(1)
+      - 최악 : O(N) -> 하나의 해시에 모든 원소가 들어있는 경우
+    - 자바의 경우
+      - list -> tree (데이터가 늘어나는 경우): 8개
+      - tree -> list(데이터가 줄어드는 경우) : 6개
+      - 6과 8로 잡은 이유 : switching 비용
 
 **자바에서 Hash Table과 HashMap의 차이**
 
