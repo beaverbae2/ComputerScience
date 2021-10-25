@@ -89,9 +89,8 @@
 **참고자료**
 
 - [생활코딩 - HTTPS와 SSL 인증서](https://opentutorials.org/course/228/4894)
-
+- [얄코 - HTTPS가 뭐고 왜 쓰나요?](https://www.youtube.com/watch?v=H6lpFRpyl14)
 - [망나니 개발자 - [Web] HTTP와 HTTPS 및 차이점](https://mangkyu.tistory.com/98)
-
 - [한재엽님 블로그](https://github.com/JaeYeopHan/Interview_Question_for_Beginner/tree/master/Network)
 
 <br>
