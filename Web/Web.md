@@ -6,11 +6,11 @@
 
 <br>
 
+## CORS
 
+참고 자료 : [[10분 테코톡] - 나봄의 CORS](https://www.youtube.com/watch?v=-2TgkKYmJt4)
 
-### CORS
-
-#### SOP(Same Origin Policy)
+### SOP(Same Origin Policy)
 
 > 동일 출처 정책,  다른 출처의 리소스를 사용하는 것을 제한 -> 보안
 
@@ -25,7 +25,7 @@
 
 -> **SOP로 인해 다른 출처의 리소스 사용하는 것 불가**
 
-#### CORS(Cross Origin Resource Sharing)
+### CORS(Cross Origin Resource Sharing)
 
 > 교차 출처 리소스 공유
 >
@@ -91,7 +91,7 @@
     - Access-Control-Allow-Credential : true
     - 단, Access-Control-Allow-Origin : * 은 허용하지 않음
 
-#### CORS 해결방법
+### CORS 해결방법
 
 - 프론트 프록시 서버
 
