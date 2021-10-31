@@ -2,7 +2,52 @@
 
 ### 목차
 
+- [MVC패턴](#MVC패턴)
+
 - [CORS](#CORS)
+
+<br>
+
+## MVC패턴
+
+참고 자료
+
+- [MVC패턴이란](https://m.blog.naver.com/jhc9639/220967034588)
+- [MVC패턴과 모델1, 모델2](https://preamtree.tistory.com/11)
+
+### MVC란
+
+> Model, View,Controller
+
+<img src="https://mblogthumb-phinf.pstatic.net/MjAxNzAzMjVfMjIg/MDAxNDkwNDM4ODMzNjI2.nzDNB5K0LuyP4joE2C4rIbL5Ue2F3at7wiI6ZpuTJN0g.WZ6V-WHZygLYW2WSdzcs7uAiAWgAJe3_H0XdkYKkutkg.PNG.jhc9639/1262.png?type=w800" style="float : left">
+
+- Model :  앱을 실행하는데 필요한 데이터(주로 DB와 연동)
+- View : 데이터를 보여주는 방식
+- Controller : 사용자의 요청에 대한 응답으로 Model과 View를 업데이트 하는 로직(비즈니스 로직)
+
+### 종류
+
+<img src = "https://t1.daumcdn.net/cfile/tistory/270EFE4C57F0C7A61C" style = "width : 70%; float : left">
+
+#### 모델1
+
+> Controller와 View를 같이 구현 -> JSP
+
+- 장점 : 빠른 개발
+- 단점 : 유지 보수 어려움
+
+#### 모델2
+
+> Controller(Servlet)와 View(JSP)를 따로 구현 
+
+- 장점 : 디자이너와 개발자 분업 유리
+- 단점 : 모델1에 비해 어려움
+
+**-> 대부분 프로젝트는 모델2로 진행** 
+
+### MVC패턴 사용 이유
+
+각자 맡은 역할 수행에만 집중 -> SRP(단일 책임 원칙) -> 유지보수성, 확장성, 유연성 증가
 
 <br>
 
